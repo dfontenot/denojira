@@ -68,12 +68,15 @@
     "https://deno.land/x/oak@v11.1.0/types.d.ts": "41951a18c3bfdb11e40707cab75da078ba8a4907cd7d4e11d8536bc2db0dde05",
     "https://deno.land/x/oak@v11.1.0/util.ts": "3af8c4ed04c6cc2bedbe66e562a77fc59c72df31c55a902a63885861ca1639d6",
     "https://deno.land/x/path_to_regexp@v6.2.1/index.ts": "894060567837bae8fc9c5cbd4d0a05e9024672083d5883b525c031eea940e556",
+    "https://esm.sh/react-dom@18.2.0/server": "254dadb754ed6c9e58892a8ac39b3bc049c305df75841f174f51ee9fe44f308b",
     "https://esm.sh/react@18.2.0": "84aa07282d2f3c843f7d56daeae0be41ceae768391c4418f7358dd64e8fe4eca",
     "https://esm.sh/stable/react@18.2.0/deno/react.js": "806868069cfdb815e028419cf07ebc7a7bcba7f9e31dec9e3a045b9f8e82c1ed",
     "https://esm.sh/v99/@types/prop-types@15.7.5/index.d.ts": "6a386ff939f180ae8ef064699d8b7b6e62bc2731a62d7fbf5e02589383838dea",
+    "https://esm.sh/v99/@types/react-dom@18.0.9/server~.d.ts": "54e0e45acce638a46c2dc13a5e9800c3fc094ec58baef3aeaedbd0c674a55249",
     "https://esm.sh/v99/@types/react@18.0.25/global.d.ts": "bbdf156fea2fabed31a569445835aeedcc33643d404fcbaa54541f06c109df3f",
     "https://esm.sh/v99/@types/react@18.0.25/index.d.ts": "12154bc47748a901d10aa84dc39d0ec3a5f2d50624a7f018b473ef5af23063b4",
     "https://esm.sh/v99/@types/scheduler@0.16.2/tracing.d.ts": "f5a8b384f182b3851cec3596ccc96cb7464f8d3469f48c74bf2befb782a19de5",
-    "https://esm.sh/v99/csstype@3.1.1/index.d.ts": "1c29793071152b207c01ea1954e343be9a44d85234447b2b236acae9e709a383"
+    "https://esm.sh/v99/csstype@3.1.1/index.d.ts": "1c29793071152b207c01ea1954e343be9a44d85234447b2b236acae9e709a383",
+    "https://esm.sh/v99/react-dom@18.2.0/deno/server.js": "bf1ce0fcb084be382713a3bbf9df8d6564cddad331ef30e9307f1c8eaa1e513d"
   }
 }
