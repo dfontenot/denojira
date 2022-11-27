@@ -8,12 +8,15 @@ import {
 } from './src/deps.ts'
 import { App } from './src/ssr/App.tsx'
 import { getLanesHandler } from './src/handlers/LanesHandlers.ts'
+import db from './src/db.ts'
 const { Application, Router } = Oak
 const { renderToString } = ReactDOMServer
 
 const app = new Application()
 
 const router = new Router()
+
+await db.sync({ drop: true })
 
 router.get('/', async (ctx) => {
   const reactSSRApp = renderToString(<App />)

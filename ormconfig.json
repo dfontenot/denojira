@@ -1,8 +1,0 @@
-{
-    "type": "postgres",
-    "database": "denojira",
-    "username": "postgres",
-    "port": 5432,
-    "hostname": "localhost",
-    "password": "password"
-}

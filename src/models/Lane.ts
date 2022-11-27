@@ -1,19 +1,22 @@
-import { Cotton } from '../deps.ts'
-const { Column, Model, Primary }  = Cotton
+import { DenoDB } from '../deps.ts'
+const { DataTypes, Model } = DenoDB
 
-@Model('lanes')
-class Lane {
-  @Primary()
-  id!: number
+class Lane extends Model {
+  static table = 'lanes'
+  static timestamps = true
 
-  @Column()
-  name!: string
+  static fields = {
+    id: {
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    name: DataTypes.STRING,
+    enabled: DataTypes.BOOLEAN,
+  }
 
-  @Column()
-  enabled!: boolean
-
-  @Column()
-  createdAt!: Date
+  static defaults = {
+    enabled: true
+  }
 }
 
 export default Lane
