@@ -1,0 +1,16 @@
+version: '3.1'
+
+services:
+  db:
+    image: "postgres:15"
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: denojira
+    volumes:
+      - "pgdata:/var/lib/postgresql/data:Z"
+volumes:
+  pgdata:
+    driver: local
