@@ -1,4 +1,5 @@
 import {
+  React,
   Oak,
   ReactDOMServer,
   Mustache,
@@ -11,13 +12,12 @@ const app = new Application()
 
 const router = new Router()
 
-router.get('/', (ctx) => {
+router.get('/', async (ctx) => {
   const reactSSRApp = renderToString(<App />)
-  ctx.response.body = Mustache.renderFile('./public/index.html.mustache', { reactApp: reactSSRApp })
-})
+  const content = await Mustache.renderFile('./public/index.html.mustache', { reactApp: reactSSRApp })
 
-app.use(router.routes())
-app.use(router.allowedMethods())
+  ctx.response.body = content
+})
 
 // Logger
 app.use(async (ctx, next) => {
@@ -35,7 +35,10 @@ app.use(async (ctx, next) => {
 })
 
 app.addEventListener('listen', () => {
-  console.log(`Listening on http://localhost:8000`);
+  console.log('Listening on http://localhost:8000');
 })
+
+app.use(router.routes())
+app.use(router.allowedMethods())
 
 await app.listen({ port: 8000 })
