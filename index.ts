@@ -1,4 +1,5 @@
-import { Application } from './src/deps.ts'
+import { Oak } from './src/deps.ts'
+const { Application } = Oak
 
 const app = new Application()
 
