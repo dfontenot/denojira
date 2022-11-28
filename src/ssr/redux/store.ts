@@ -12,4 +12,5 @@ export const store = configureStore({
   devTools: true,
 })
 
+// source: https://stackoverflow.com/a/73151014/854854
 export type StoreDispatch = typeof store.dispatch

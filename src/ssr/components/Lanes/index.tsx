@@ -23,6 +23,7 @@ export const Lanes = () => {
 
   useEffect(() => {
     if (lanesFetchStatus === 'idle') {
+      console.log('will do an API call')
       dispatch(fetchLanesAction())
     }
 
@@ -39,5 +40,5 @@ export const Lanes = () => {
     content = `bad ${lanesFetchError}`
   }
 
-  return <p>some swim lanes go here{content}</p>
+  return <p>some swim lanes go here: {content}</p>
 }
