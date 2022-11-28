@@ -1,25 +1,43 @@
-import { React } from '../../../deps.ts'
-import { useGetLanesQuery } from '../../redux/apiSlice.ts'
+import {
+  React,
+  ReactRedux,
+} from '../../../deps.ts'
+import {
+  fetchLanesAction,
+  LaneSliceState
+} from '../../redux/apiSlice.ts'
+import { StoreDispatch } from '../../redux/store.ts'
+
+const {
+  useDispatch,
+  useSelector,
+} = ReactRedux
+const { useEffect } = React
 
 export const Lanes = () => {
-  const {
-    data: posts,
-    isLoading,
-    isSuccess,
-    isError,
-    error
-  } = useGetLanesQuery()
+
+  const dispatch = useDispatch<StoreDispatch>()
+  const lanesFetchStatus = useSelector<LaneSliceState>((state) => state.lanes.status)
+  const lanesFetchError = useSelector<LaneSliceState>((state) => state.lanes.error)
+  const lanes = useSelector<LaneSliceState>((state) => state.lanes.lanes)
+
+  useEffect(() => {
+    if (lanesFetchStatus === 'idle') {
+      dispatch(fetchLanesAction())
+    }
+
+  }, [lanesFetchStatus, dispatch])
 
   let content
-  if (isLoading) {
+  if (lanesFetchStatus === 'loading') {
     content = 'loading'
   }
-  else if (isSuccess) {
+  else if (lanesFetchStatus === 'succeeded') {
     content = 'yay'
   }
-  else if (isError) {
-    content = `bad ${error}`
+  else if (lanesFetchStatus === 'failed') {
+    content = `bad ${lanesFetchError}`
   }
 
-  return <p>{content}</p>
+  return <p>some swim lanes go here{content}</p>
 }
