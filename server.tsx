@@ -36,7 +36,7 @@ router.get('/static/app.js', async (ctx) => {
   ctx.response.body = code
 })
 
-router.get('/lanes', getLanesHandler)
+router.get('/api/lanes', getLanesHandler)
 
 // Logger
 app.use(async (ctx, next) => {

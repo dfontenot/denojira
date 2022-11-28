@@ -7,4 +7,5 @@ import React from 'https://esm.sh/react@18'
 export { React }
 export * as ReactDOMServer from 'https://esm.sh/react-dom@18/server'
 export * as ReactDOM from 'https://esm.sh/react-dom@18'
-
+export * as ReduxToolkit from 'https://esm.sh/@reduxjs/toolkit@1.9'
+export * as RTK from 'https://esm.sh/@reduxjs/toolkit@1.9/query/react'
