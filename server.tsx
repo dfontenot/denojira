@@ -7,7 +7,10 @@ import {
   ReactDOMServer,
 } from './src/deps.ts'
 import { App } from './src/ssr/App.tsx'
-import { getLanesHandler } from './src/handlers/LanesHandlers.ts'
+import {
+  createNewLaneHandler,
+  getLanesHandler,
+} from './src/handlers/LanesHandlers.ts'
 import db from './src/db.ts'
 const { Application, Router } = Oak
 const { renderToString } = ReactDOMServer
@@ -37,6 +40,7 @@ router.get('/static/app.js', async (ctx) => {
 })
 
 router.get('/api/lanes', getLanesHandler)
+router.post('/api/lane', createNewLaneHandler)
 
 // Logger
 app.use(async (ctx, next) => {
