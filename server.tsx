@@ -1,7 +1,6 @@
 import {
   DenoEmit,
   ESBuild,
-  ESBuildCSSModulesPlugin,
   ESBuildDenoLoader,
   Mustache,
   Path,
@@ -17,7 +16,10 @@ import {
   getLanesHandler,
 } from './src/handlers/LanesHandlers.ts'
 import db from './src/db/db.ts'
-const { Application, Router } = Oak
+const {
+  Application,
+  Router,
+  send } = Oak
 const { renderToString } = ReactDOMServer
 
 const app = new Application()
@@ -44,6 +46,10 @@ router.get('/old/static/app.js', async (ctx) => {
   ctx.response.body = code
 })
 
+router.get('/static/app.css', async (ctx) => {
+  await send(ctx, './public/css/app.css')
+})
+
 router.get('/static/app.js', async (ctx) => {
 
   const built = await ESBuild.build({
@@ -59,10 +65,6 @@ router.get('/static/app.js', async (ctx) => {
     loader: { '.tsx': 'tsx' },
     plugins: [
       ESBuildDenoLoader.denoPlugin(),
-      ESBuildCSSModulesPlugin({
-        inject: true,
-        filter: /\.modules?\.css$/i,
-      })
     ],
   })
 

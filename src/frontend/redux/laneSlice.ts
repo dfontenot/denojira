@@ -44,7 +44,14 @@ const lanesSlice = createSlice({
       })
       .addCase(fetchLanesAction.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        //state.lanes = action.payload // TODO
+        console.log('payload', action.payload);
+
+        (async () => {
+          for await (const chunk of action?.payload?.getReader()) {
+            console.log(chunk)
+          }
+        })()
+        //state.lanes = action.payload
       })
       .addCase(fetchLanesAction.rejected, (state, action) => {
         state.status = 'failed'

@@ -1,8 +1,8 @@
-.lanesParent {
+.lanes-parent {
   display: flex;
   flex-grow: 1;
 }
 
-.laneItem {
+.lane-item {
   padding: .5em;
 }

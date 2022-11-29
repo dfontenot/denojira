@@ -9,7 +9,6 @@ import {
 } from '../../redux/laneSlice.ts'
 import { StoreDispatch } from '../../redux/store.ts'
 import { Lane } from '../../../models/Lane.ts'
-import styles from './styles.module.css'
 
 const {
   useDispatch,
@@ -36,7 +35,7 @@ export const Lanes = () => {
   if (lanesFetchStatus === 'idle') {
     content = 'not loaded yet'
   }
-  if (lanesFetchStatus === 'loading') {
+  else if (lanesFetchStatus === 'loading') {
     content = 'loading...'
   }
   else if (lanesFetchStatus === 'succeeded') {
@@ -49,11 +48,11 @@ export const Lanes = () => {
     console.log('async thunk issue', lanesFetchStatus)
   }
 
-  console.log('still here?')
+  console.log('still here?', lanesFetchStatus, lanes)
   return <>
       <p>{content}</p>
-      <div className={styles.lanesParent}>
-        {lanes.map((lane, idx) => <div key={idx} className={styles.laneItem}>{lane.name}</div>)}
+      <div className="lanes-parent">
+        {lanes.map((lane, idx) => <div key={idx} className="lane-item">test {lane.name}</div>)}
       </div>
     </>
 }
