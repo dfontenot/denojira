@@ -39,6 +39,10 @@ export const Lanes = () => {
   else if (lanesFetchStatus === 'failed') {
     content = `bad ${lanesFetchError}`
   }
+  else {
+    console.log('async thunk issue', lanesFetchStatus)
+  }
 
+  console.log('still here?')
   return <p>some swim lanes go here: {content}</p>
 }
