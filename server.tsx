@@ -58,7 +58,7 @@ router.get('/static/app.js', async (ctx) => {
   //
   // transformed.warnings.forEach((warning) => console.log('caught esbuild transform warning', warning))
   const built = await ESBuild.build({
-    entryPoints: ['./src/frontend/App.tsx'],
+    entryPoints: ['./src/frontend/index.tsx'],
     format: 'iife',
     treeShaking: true,
     target: ['es2020', 'firefox107', 'chrome107'],

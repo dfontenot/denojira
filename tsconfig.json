@@ -3,8 +3,8 @@
     "target": "es6",
     "module": "commonjs",
     "lib": [
-      "DOM",
-      "ES2017",
+      "dom",
+      "ES2020",
       "deno.ns"
     ],
     "strict": true,
