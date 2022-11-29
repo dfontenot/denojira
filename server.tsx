@@ -1,6 +1,7 @@
 import {
   DenoEmit,
   ESBuild,
+  ESBuildDenoLoader,
   Mustache,
   Path,
   Oak,
@@ -41,27 +42,32 @@ router.get('/old/static/app.js', async (ctx) => {
 })
 
 router.get('/static/app.js', async (ctx) => {
-  const transformed = await ESBuild.transform(
-    await Deno.readFile('./src/ssr/App.tsx'),
-    {
-      loader: 'tsx',
-      minify: true,
-      minifySyntax: true,
-      sourcefile: './src/ssr/App.tsx',
-      target: ['es2020', 'firefox107', 'chrome107'],
-      treeShaking: true,
-      tsconfigRaw: await Deno.readFile('./tsconfig.json'),
-    } as ESBuild.TransformOptions)
-
-  transformed.warnings.forEach((warning) => console.log('caught esbuild transform warning', warning))
-  // const foo = await ESBuild.build({
-  //   entryPoints: ['./src/ssr/App.tsx'],
-  //   bundle: true,
-  //   plugins: [],
-  // })
+  // const transformed = await ESBuild.transform(
+  //   await Deno.readFile('./src/ssr/App.tsx'),
+  //   {
+  //     loader: 'tsx',
+  //     minify: true,
+  //     minifySyntax: true,
+  //     sourcefile: './src/ssr/App.tsx',
+  //     target: ['es2020', 'firefox107', 'chrome107'],
+  //     treeShaking: true,
+  //     tsconfigRaw: await Deno.readFile('./tsconfig.json'),
+  //   } as ESBuild.TransformOptions)
+  //
+  // transformed.warnings.forEach((warning) => console.log('caught esbuild transform warning', warning))
+  const built = await ESBuild.build({
+    entryPoints: ['./src/ssr/App.tsx'],
+    format: 'iife',
+    treeShaking: true,
+    target: ['es2020', 'firefox107', 'chrome107'],
+    write: false,
+    bundle: true,
+    loader: { '.tsx': 'tsx' },
+    plugins: [ESBuildDenoLoader.denoPlugin()],
+  })
 
   ctx.response.headers.set('Content-Type', 'text/javascript')
-  ctx.response.body = transformed.code
+  ctx.response.body = built.outputFiles[0].contents
 })
 
 router.get('/api/lanes', getLanesHandler)
