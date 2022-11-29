@@ -16,7 +16,7 @@ import {
   createNewLaneHandler,
   getLanesHandler,
 } from './src/handlers/LanesHandlers.ts'
-import db from './src/db.ts'
+import db from './src/db/db.ts'
 const { Application, Router } = Oak
 const { renderToString } = ReactDOMServer
 

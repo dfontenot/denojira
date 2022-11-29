@@ -9,6 +9,7 @@ import {
 } from '../../redux/laneSlice.ts'
 import { StoreDispatch } from '../../redux/store.ts'
 import { Lane } from '../../../models/Lane.ts'
+import styles from './styles.module.css'
 
 const {
   useDispatch,
@@ -49,5 +50,10 @@ export const Lanes = () => {
   }
 
   console.log('still here?')
-  return <p>some swim lanes go here: {content}</p>
+  return <>
+      <p>{content}</p>
+      <div className={styles.lanesParent}>
+        {lanes.map((lane, idx) => <div key={idx} className={styles.laneItem}>{lane.name}</div>)}
+      </div>
+    </>
 }
