@@ -1,7 +1,7 @@
 import {
   Oak,
 } from '../deps-backend.ts'
-import { Lane } from '../models/index.ts'
+import { Lane } from '../db/models/index.ts'
 
 const getLanesHandler = async (ctx: Oak.Context) => {
   ctx.response.body = await Lane.all()

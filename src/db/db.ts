@@ -1,4 +1,4 @@
-import { DenoDB } from './deps-backend.ts'
+import { DenoDB } from '../deps-backend.ts'
 import { Lane } from './models/index.ts'
 const { Database,
   PostgresConnector,

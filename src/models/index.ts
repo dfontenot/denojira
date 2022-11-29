@@ -1,3 +1,3 @@
-import Lane from './Lane.ts'
+import { Lane } from './Lane.ts'
 
-export { Lane }
+export type { Lane }

@@ -1,7 +1,7 @@
 import {
   ReduxToolkit,
 } from '../../deps-frontend.ts'
-import { SwimLane } from '../../models/Lane.ts'
+import { Lane } from '../../models/Lane.ts'
 
 const {
   createAction,
@@ -10,7 +10,7 @@ const {
 } = ReduxToolkit
 
 export interface LaneState {
-  lanes: SwimLane[],
+  lanes: Lane[],
   status: 'idle' | 'loading' | 'succeeded' | 'failed',
   error?: string
 }
