@@ -9,9 +9,11 @@ const {
   createSlice
 } = ReduxToolkit
 
+export type LaneFetchStatus = 'idle' | 'loading' | 'succeeded' | 'failed'
+
 export interface LaneState {
   lanes: Lane[],
-  status: 'idle' | 'loading' | 'succeeded' | 'failed',
+  status: LaneFetchStatus,
   error?: string
 }
 

@@ -4,9 +4,11 @@ import {
 } from '../../../deps-frontend.ts'
 import {
   fetchLanesAction,
-  LaneSliceState
+  LaneFetchStatus,
+  LaneSliceState,
 } from '../../redux/laneSlice.ts'
 import { StoreDispatch } from '../../redux/store.ts'
+import { Lane } from '../../../models/Lane.ts'
 
 const {
   useDispatch,
@@ -17,9 +19,9 @@ const { useEffect } = React
 export const Lanes = () => {
 
   const dispatch = useDispatch<StoreDispatch>()
-  const lanesFetchStatus = useSelector<LaneSliceState>((state) => state.lanes.status)
-  const lanesFetchError = useSelector<LaneSliceState>((state) => state.lanes.error)
-  const lanes = useSelector<LaneSliceState>((state) => state.lanes.lanes)
+  const lanesFetchStatus = useSelector<LaneSliceState, LaneFetchStatus>((state) => state.lanes.status)
+  const lanesFetchError = useSelector<LaneSliceState, string | undefined>((state) => state.lanes.error)
+  const lanes = useSelector<LaneSliceState, Lane[]>((state) => state.lanes.lanes)
 
   useEffect(() => {
     if (lanesFetchStatus === 'idle') {
