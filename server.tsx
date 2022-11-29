@@ -1,5 +1,6 @@
 import {
   DenoEmit,
+  ESBuild,
   Mustache,
   Path,
   Oak,
@@ -29,7 +30,7 @@ router.get('/', async (ctx) => {
   ctx.response.body = content
 })
 
-router.get('/static/app.js', async (ctx) => {
+router.get('/old/static/app.js', async (ctx) => {
   // NOTE: choosing to manually bundle each time in dev for reloadability TODO: caching settings
   // TODO: bundle is really slow, ~2 seconds locally, will probably need a new solution
   const appUrl = Path.toFileUrl(Path.resolve('./src/ssr/App.tsx'))
@@ -37,6 +38,30 @@ router.get('/static/app.js', async (ctx) => {
 
   ctx.response.headers.set('Content-Type', 'text/javascript')
   ctx.response.body = code
+})
+
+router.get('/static/app.js', async (ctx) => {
+  const transformed = await ESBuild.transform(
+    await Deno.readFile('./src/ssr/App.tsx'),
+    {
+      loader: 'tsx',
+      minify: true,
+      minifySyntax: true,
+      sourcefile: './src/ssr/App.tsx',
+      target: ['es2020', 'firefox107', 'chrome107'],
+      treeShaking: true,
+      tsconfigRaw: await Deno.readFile('./tsconfig.json'),
+    } as ESBuild.TransformOptions)
+
+  transformed.warnings.forEach((warning) => console.log('caught esbuild transform warning', warning))
+  // const foo = await ESBuild.build({
+  //   entryPoints: ['./src/ssr/App.tsx'],
+  //   bundle: true,
+  //   plugins: [],
+  // })
+
+  ctx.response.headers.set('Content-Type', 'text/javascript')
+  ctx.response.body = transformed.code
 })
 
 router.get('/api/lanes', getLanesHandler)
