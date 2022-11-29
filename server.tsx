@@ -1,6 +1,7 @@
 import {
   DenoEmit,
   ESBuild,
+  ESBuildCSSModulesPlugin,
   ESBuildDenoLoader,
   Mustache,
   Path,
@@ -44,19 +45,7 @@ router.get('/old/static/app.js', async (ctx) => {
 })
 
 router.get('/static/app.js', async (ctx) => {
-  // const transformed = await ESBuild.transform(
-  //   await Deno.readFile('./src/frontend/App.tsx'),
-  //   {
-  //     loader: 'tsx',
-  //     minify: true,
-  //     minifySyntax: true,
-  //     sourcefile: './src/frontend/App.tsx',
-  //     target: ['es2020', 'firefox107', 'chrome107'],
-  //     treeShaking: true,
-  //     tsconfigRaw: await Deno.readFile('./tsconfig.json'),
-  //   } as ESBuild.TransformOptions)
-  //
-  // transformed.warnings.forEach((warning) => console.log('caught esbuild transform warning', warning))
+
   const built = await ESBuild.build({
     entryPoints: ['./src/frontend/index.tsx'],
     format: 'iife',
@@ -68,7 +57,13 @@ router.get('/static/app.js', async (ctx) => {
     write: false,
     bundle: true,
     loader: { '.tsx': 'tsx' },
-    plugins: [ESBuildDenoLoader.denoPlugin()],
+    plugins: [
+      ESBuildDenoLoader.denoPlugin(),
+      ESBuildCSSModulesPlugin({
+        inject: true,
+        filter: /\.modules?\.css$/i,
+      })
+    ],
   })
 
   ctx.response.headers.set('Content-Type', 'text/javascript')

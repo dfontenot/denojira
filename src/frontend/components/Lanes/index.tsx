@@ -30,8 +30,11 @@ export const Lanes = () => {
   }, [lanesFetchStatus, dispatch])
 
   let content
+  if (lanesFetchStatus === 'idle') {
+    content = 'not loaded yet'
+  }
   if (lanesFetchStatus === 'loading') {
-    content = 'loading'
+    content = 'loading...'
   }
   else if (lanesFetchStatus === 'succeeded') {
     content = 'yay'

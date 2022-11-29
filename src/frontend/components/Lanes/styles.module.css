@@ -1,0 +1,8 @@
+.lanesParent {
+  display: flex;
+  flex-grow: 1;
+}
+
+.lanesItem {
+  padding: .5em;
+}
