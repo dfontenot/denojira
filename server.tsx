@@ -5,9 +5,11 @@ import {
   Mustache,
   Path,
   Oak,
+} from './src/deps-backend.ts'
+import {
   React,
   ReactDOMServer,
-} from './src/deps.ts'
+} from './src/deps-frontend.ts'
 import { App } from './src/frontend/App.tsx'
 import {
   createNewLaneHandler,

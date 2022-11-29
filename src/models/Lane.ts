@@ -1,4 +1,4 @@
-import { DenoDB } from '../deps.ts'
+import { DenoDB } from '../deps-backend.ts'
 const { DataTypes, Model } = DenoDB
 
 export interface SwimLane {

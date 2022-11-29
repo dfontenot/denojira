@@ -1,6 +1,6 @@
 import {
   ReduxToolkit,
-} from '../../deps.ts'
+} from '../../deps-frontend.ts'
 import { SwimLane } from '../../models/Lane.ts'
 
 const {

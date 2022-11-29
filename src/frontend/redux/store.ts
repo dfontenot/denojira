@@ -1,6 +1,6 @@
 import {
   ReduxToolkit,
-} from '../../deps.ts'
+} from '../../deps-frontend.ts'
 import laneSlice from './apiSlice.ts'
 
 const { configureStore } = ReduxToolkit
