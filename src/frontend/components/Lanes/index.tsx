@@ -5,7 +5,7 @@ import {
 import {
   fetchLanesAction,
   LaneSliceState
-} from '../../redux/apiSlice.ts'
+} from '../../redux/laneSlice.ts'
 import { StoreDispatch } from '../../redux/store.ts'
 
 const {
