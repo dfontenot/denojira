@@ -5,22 +5,8 @@ import {
   Card,
   Lane,
 } from '../db/models/index.ts'
+import { GetCardsResponse } from '../models/Card.ts'
 import { serializeWithBigIntQuoted } from './utils.ts'
-
-interface CardResponse {
-  id: string,
-  title: string,
-  description: string,
-}
-
-interface CardsLaneGrouping {
-  laneName: string,
-  cards: CardResponse[],
-}
-
-interface GetCardsResponse {
-  byLaneId: { [key: string]: CardsLaneGrouping }
-}
 
 const getCardsHandler = async (ctx: Oak.Context) => {
 

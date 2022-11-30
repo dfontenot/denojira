@@ -7,6 +7,11 @@ import {
   LaneFetchStatus,
   LaneSliceState,
 } from '../../redux/laneSlice.ts'
+import {
+  fetchCardsAction,
+  CardsFetchStatus,
+  CardsSliceState,
+} from '../../redux/cardsSlice.ts'
 import { StoreDispatch } from '../../redux/store.ts'
 import { Lane } from '../../../models/Lane.ts'
 
@@ -23,13 +28,22 @@ export const Lanes = () => {
   const lanesFetchError = useSelector<LaneSliceState, string | undefined>((state) => state.lanes.error)
   const lanes = useSelector<LaneSliceState, Lane[]>((state) => state.lanes.lanes)
 
+  const cardsFetchStatus = useSelector<CardsSliceState, CardsFetchStatus>((state) => state.cards.status)
+  const cardsFetchError = useSelector<CardsSliceState, string | undefined>((state) => state.cards.error)
+  const cards = useSelector<CardsSliceState, Lane[]>((state) => state.cards.groupedCards)
+
   useEffect(() => {
     if (lanesFetchStatus === 'idle') {
-      console.log('will do an API call')
+      console.log('will do lanes API call')
       dispatch(fetchLanesAction())
     }
 
-  }, [lanesFetchStatus, dispatch])
+    if (cardsFetchStatus === 'idle') {
+      console.log('will do cards API call')
+      dispatch(fetchCardsAction())
+    }
+
+  }, [lanesFetchStatus, cardsFetchStatus, dispatch])
 
   let content
   if (lanesFetchStatus === 'idle') {

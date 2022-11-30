@@ -2,12 +2,14 @@ import {
   ReduxToolkit,
 } from '../../deps-frontend.ts'
 import laneSlice from './laneSlice.ts'
+import cardsSlice from './cardsSlice.ts'
 
 const { configureStore } = ReduxToolkit
 
 export const store = configureStore({
   reducer: {
     lanes: laneSlice.reducer,
+    cards: cardsSlice.reducer,
   },
   devTools: true,
 })
