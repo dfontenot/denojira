@@ -6,7 +6,6 @@ import {
 const {
   Database,
   PostgresConnector,
-  Relationships,
 } = DenoDB
 
 const conn = new PostgresConnector({
@@ -18,10 +17,8 @@ const conn = new PostgresConnector({
 
 const db = new Database(conn)
 
-Relationships.belongsTo(Card, Lane)
-
 // NOTE: this ordering is important, card can't go first due to FK on lanes table
-db.link([Lane, Card])
+export const linkModels = () => db.link([Lane, Card])
 
 export default db
 
