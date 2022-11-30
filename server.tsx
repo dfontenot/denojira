@@ -12,9 +12,11 @@ import {
 } from './src/deps-frontend.ts'
 import { App } from './src/frontend/App.tsx'
 import {
+  createNewCardHandler,
   createNewLaneHandler,
+  getCardsHandler,
   getLanesHandler,
-} from './src/handlers/LanesHandlers.ts'
+} from './src/handlers/index.ts'
 import db, { linkModels } from './src/db/db.ts'
 const {
   Application,
@@ -78,6 +80,9 @@ router.get('/static/app.js', async (ctx) => {
 
 router.get('/api/lanes', getLanesHandler)
 router.post('/api/lane', createNewLaneHandler)
+
+router.get('/api/cards', getCardsHandler)
+router.post('/api/card', createNewCardHandler)
 
 // Logger
 app.use(async (ctx, next) => {

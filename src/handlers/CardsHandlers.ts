@@ -1,0 +1,69 @@
+import {
+  Oak,
+} from '../deps-backend.ts'
+import {
+  Card,
+  Lane,
+} from '../db/models/index.ts'
+import { serializeWithBigIntQuoted } from './utils.ts'
+
+interface CardResponse {
+  id: string,
+  title: string,
+  description: string,
+}
+
+interface CardsLaneGrouping {
+  laneName: string,
+  cards: CardResponse[],
+}
+
+interface GetCardsResponse {
+  byLaneId: { [key: string]: CardsLaneGrouping }
+}
+
+const getCardsHandler = async (ctx: Oak.Context) => {
+
+  //const joinedResults = await Card.join(Lane, Lane.field('id'), Card.field('lane_id')).get()
+  const joinedResults = await Card.select(Card.field('id', 'cardId'), 'name', 'laneId', 'title', 'description')
+    .join(Lane.select(Lane.field('id', 'laneId'), 'name', 'is_enabled'), Lane.field('id'), Card.field('lane_id')).get()
+
+  // TODO: clean up typing errors
+  const grouped = joinedResults.reduce<GetCardsResponse>((acc, row) => {
+    const key = `${row.laneId}`
+    const newCard = { id: row.cardId, title: row.title, description: row.description }
+
+    if (acc.hasOwnProperty(key)) {
+      acc[key].cards.push(newCard)
+    }
+    else {
+      acc[key] = { laneName: row.name, cards: [newCard] }
+    }
+
+    return acc
+  }, {})
+
+  ctx.response.body = serializeWithBigIntQuoted(grouped)
+}
+
+const createNewCardHandler = async (ctx: Oak.Context) => {
+  const { value } = ctx.request.body({ type: 'json' })
+  const { title, description, laneId } = await value
+
+  ctx.response.headers.set('Content-Type', 'application/json')
+
+  if (await Lane.where('id', `${laneId}`).count() <= 0) {
+    ctx.response.status = Oak.Status.BadRequest
+    ctx.response.body = { 'error': 'no such lane id' }
+  }
+  else {
+    const created = await Card.create({ title, description, laneId: `${laneId}` })
+
+    ctx.response.body = serializeWithBigIntQuoted(created)
+  }
+}
+
+export {
+  createNewCardHandler,
+  getCardsHandler,
+}
