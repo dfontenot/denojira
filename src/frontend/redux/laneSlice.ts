@@ -4,7 +4,6 @@ import {
 import { Lane } from '../../models/Lane.ts'
 
 const {
-  createAction,
   createAsyncThunk,
   createSlice
 } = ReduxToolkit
@@ -27,10 +26,8 @@ const initialState: LaneState = {
 }
 
 export const fetchLanesAction = createAsyncThunk('lanes/fetchLanes', async () => {
-  return (await fetch('/api/lanes')).body
+  return (await fetch('/api/lanes')).json()
 })
-
-//const fetchLanes = createAction<SwimLane[]>('fetchLanes')
 
 const lanesSlice = createSlice({
   name: 'lanes',
@@ -45,24 +42,13 @@ const lanesSlice = createSlice({
       .addCase(fetchLanesAction.fulfilled, (state, action) => {
         state.status = 'succeeded'
         console.log('payload', action.payload);
-
-        (async () => {
-          for await (const chunk of action?.payload?.getReader()) {
-            console.log(chunk)
-          }
-        })()
-        //state.lanes = action.payload
+        state.lanes = action.payload
       })
       .addCase(fetchLanesAction.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message
       })
   },
-  // extraReducers: (builder) => {
-  //   builder.addCase(fetchLanes, (state, action) => {
-  //     return state // TODO
-  //   })
-  // },
 })
 
 export default lanesSlice

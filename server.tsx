@@ -26,7 +26,7 @@ const app = new Application()
 
 const router = new Router()
 
-await db.sync({ drop: true })
+await db.sync()
 
 router.get('/', async (ctx) => {
   const reactSSRApp = renderToString(<App />)
