@@ -14,6 +14,8 @@ import {
 } from '../../redux/cardsSlice.ts'
 import { StoreDispatch } from '../../redux/store.ts'
 import { Lane } from '../../../models/Lane.ts'
+import { GetCardsResponse } from '../../../models/Card.ts'
+import { Cards } from '../Cards/index.tsx'
 
 const {
   useDispatch,
@@ -30,7 +32,7 @@ export const Lanes = () => {
 
   const cardsFetchStatus = useSelector<CardsSliceState, CardsFetchStatus>((state) => state.cards.status)
   const cardsFetchError = useSelector<CardsSliceState, string | undefined>((state) => state.cards.error)
-  const cards = useSelector<CardsSliceState, Lane[]>((state) => state.cards.groupedCards)
+  const cards = useSelector<CardsSliceState, GetCardsResponse>((state) => state.cards.groupedCards)
 
   useEffect(() => {
     if (lanesFetchStatus === 'idle') {
@@ -45,6 +47,7 @@ export const Lanes = () => {
 
   }, [lanesFetchStatus, cardsFetchStatus, dispatch])
 
+  // TODO: also show loading for the cards API
   let content
   if (lanesFetchStatus === 'idle') {
     content = 'not loaded yet'
@@ -58,15 +61,14 @@ export const Lanes = () => {
   else if (lanesFetchStatus === 'failed') {
     content = `bad ${lanesFetchError}`
   }
-  else {
-    console.log('async thunk issue', lanesFetchStatus)
-  }
 
-  console.log('still here?', lanesFetchStatus, lanes)
   return <>
       <p>{content}</p>
       <div className="lanes-parent">
-        {lanes.map((lane, idx) => <div key={idx} className="lane-item">{lane.name}</div>)}
+        {lanes.map((lane, idx) => {
+          const cardsInLane = (cards.byLaneId[lane.id] || { cards: [] })['cards']
+          return <div key={idx} className="lane-item"><p>{lane.name}</p><Cards cardData={cardsInLane}/></div>
+        })}
       </div>
     </>
 }
