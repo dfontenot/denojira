@@ -5,4 +5,7 @@
 
 .lane-item {
   padding: .5em;
+  margin: .2em;
+  border: 5px double #000000;
+  border-radius: 8px;
 }

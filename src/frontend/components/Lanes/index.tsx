@@ -39,7 +39,7 @@ export const Lanes = () => {
     content = 'loading...'
   }
   else if (lanesFetchStatus === 'succeeded') {
-    content = 'yay'
+    content = 'data loaded'
   }
   else if (lanesFetchStatus === 'failed') {
     content = `bad ${lanesFetchError}`
@@ -52,7 +52,7 @@ export const Lanes = () => {
   return <>
       <p>{content}</p>
       <div className="lanes-parent">
-        {lanes.map((lane, idx) => <div key={idx} className="lane-item">test {lane.name}</div>)}
+        {lanes.map((lane, idx) => <div key={idx} className="lane-item">{lane.name}</div>)}
       </div>
     </>
 }
