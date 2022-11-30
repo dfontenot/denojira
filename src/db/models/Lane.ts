@@ -1,4 +1,5 @@
 import { DenoDB } from '../../deps-backend.ts'
+import Card from './Card.ts'
 const { DataTypes, Model } = DenoDB
 
 class Lane extends Model {
@@ -9,6 +10,7 @@ class Lane extends Model {
     id: {
       primaryKey: true,
       autoIncrement: true,
+      type: DataTypes.BIG_INTEGER,
     },
     name: DataTypes.STRING,
     enabled: DataTypes.BOOLEAN,
@@ -16,6 +18,10 @@ class Lane extends Model {
 
   static defaults = {
     enabled: true
+  }
+
+  static cards() {
+    return this.hasMany(Card)
   }
 }
 
