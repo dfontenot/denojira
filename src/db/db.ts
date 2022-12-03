@@ -15,7 +15,7 @@ const conn = new PostgresConnector({
   database: 'denojira',
 })
 
-const db = new Database(conn)
+const db = new Database({ connector: conn, debug: true })
 
 // NOTE: this ordering is important, card can't go first due to FK on lanes table
 export const linkModels = () => db.link([Lane, Card])
