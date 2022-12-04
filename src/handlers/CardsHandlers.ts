@@ -12,7 +12,7 @@ const getCardsHandler = async (ctx: Oak.Context) => {
 
   //const joinedResults = await Card.join(Lane, Lane.field('id'), Card.field('lane_id')).get()
   const joinedResults = await Card.select(Card.field('id', 'cardId'), 'name', 'laneId', 'title', 'description')
-    .join(Lane.select(Lane.field('id', 'laneId'), 'name', 'is_enabled'), Lane.field('id'), Card.field('lane_id')).get()
+    .join(Lane.select(Lane.field('id', 'laneId'), 'name', 'enabled'), Lane.field('id'), Card.field('lane_id')).get()
 
   // TODO: clean up typing errors
   const grouped = joinedResults.reduce<GetCardsResponse>((acc, row) => {

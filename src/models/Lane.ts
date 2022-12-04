@@ -1,5 +1,5 @@
 export interface Lane {
-  id: number,
+  laneId: number,
   name: string,
   enabled: boolean,
   createdAt: Date,

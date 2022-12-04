@@ -21,7 +21,7 @@ export interface CardsSliceState {
 }
 
 const initialState: CardsState = {
-  groupedCards: { byLaneId: {} },
+  groupedCards: { },
   status: 'idle',
 }
 

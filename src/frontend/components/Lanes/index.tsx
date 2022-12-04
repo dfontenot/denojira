@@ -66,8 +66,8 @@ export const Lanes = () => {
       <p>{content}</p>
       <div className="lanes-parent">
         {lanes.map((lane, idx) => {
-          const cardsInLane = (cards.byLaneId[lane.id] || { cards: [] })['cards']
-          return <div key={idx} className="lane-item"><p>{lane.name}</p><Cards cardData={cardsInLane}/></div>
+          const cardsInLane = (cards[lane.laneId] || { cards: [] })['cards']
+          return <div key={idx} className="lane-item"><p>{lane.name}</p><Cards cardData={cardsInLane} /></div>
         })}
       </div>
     </>

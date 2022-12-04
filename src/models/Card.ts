@@ -10,5 +10,5 @@ export interface CardsLaneGrouping {
 }
 
 export interface GetCardsResponse {
-  byLaneId: { [key: string]: CardsLaneGrouping }
+  [key: string]: CardsLaneGrouping
 }
