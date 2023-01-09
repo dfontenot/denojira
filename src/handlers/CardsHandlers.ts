@@ -38,14 +38,16 @@ export interface CreateCardRequest {
   laneId: number | string,
 }
 
+// see https://stackoverflow.com/a/10841867/854854
+const doesLaneExist = async (laneId: number | string) => await Lane.where('id', `${laneId}`).groupBy('id').count() > 0
+
 const createNewCardHandler = async (ctx: Oak.Context) => {
   const { value } = ctx.request.body({ type: 'json' })
   const { title, description, laneId }: CreateCardRequest = await value
 
   ctx.response.headers.set('Content-Type', 'application/json')
 
-  // see https://stackoverflow.com/a/10841867/854854
-  if (await Lane.where('id', `${laneId}`).groupBy('id').count() <= 0) {
+  if (! doesLaneExist(laneId)) {
     ctx.response.status = Oak.Status.BadRequest
     ctx.response.body = { 'error': 'no such lane id' }
   }
@@ -56,7 +58,35 @@ const createNewCardHandler = async (ctx: Oak.Context) => {
   }
 }
 
+export interface MoveCardRequest {
+  cardId: number | string,
+  destinationLaneId: number | string,
+}
+
+const moveCardHandler = async (ctx: Oak.Context) => {
+  const { value } = ctx.request.body({ type: 'json' })
+  const { cardId, destinationLaneId }: MoveCardRequest = await value
+
+  if (! doesLaneExist(destinationLaneId)) {
+    ctx.response.status = Oak.Status.BadRequest
+    ctx.response.body = { 'error': 'no such lane id' }
+    return
+  }
+
+  const cardModel = Card.where('id', cardId)
+  const card = await cardModel.get()
+
+  if (! card) {
+    ctx.response.status = Oak.Status.BadRequest
+    ctx.response.body = { 'error': 'no such card id' }
+    return
+  }
+
+  // TODO: update lane id
+}
+
 export {
   createNewCardHandler,
   getCardsHandler,
+  moveCardHandler,
 }
