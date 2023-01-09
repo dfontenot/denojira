@@ -6,11 +6,12 @@ import { Card } from '../Card/index.tsx'
 
 interface Props {
   cardData: CardResponse[]
+  laneId: number | string
 }
 
-export const Cards = ({ cardData }: Props) => {
+export const Cards = ({ cardData, laneId }: Props) => {
 
   return <div className='lane-cards-parent'>
-    {cardData.map((card: CardResponse) => <Card key={card.id} title={card.title} description={card.description} />)}
+    {cardData.map((card: CardResponse) => <Card key={card.id} id={card.id} laneId={laneId} title={card.title} description={card.description} />)}
     </div>
 }

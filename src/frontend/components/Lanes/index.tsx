@@ -12,9 +12,10 @@ import {
 } from '../../redux/cardsSlice.ts'
 import { type FetchStatus } from '../../redux/slices.ts'
 import { StoreDispatch } from '../../redux/store.ts'
-import { Lane } from '../../../models/Lane.ts'
-import { GetCardsResponse } from '../../../models/Card.ts'
+import { type Lane as LaneModel } from '../../../models/Lane.ts'
+import { type GetCardsResponse } from '../../../models/Card.ts'
 import { Cards } from '../Cards/index.tsx'
+import { Lane } from '../Lane/index.tsx'
 
 const {
   useDispatch,
@@ -28,7 +29,7 @@ export const Lanes = () => {
   const lanesFetchStatus = useSelector<LaneSliceState, FetchStatus>((state) => state.lanes.loadingStatus)
 
   const lanesFetchError = useSelector<LaneSliceState, string | undefined>((state) => state.lanes.error)
-  const lanes = useSelector<LaneSliceState, Lane[]>((state) => state.lanes.lanes)
+  const lanes = useSelector<LaneSliceState, LaneModel[]>((state) => state.lanes.lanes)
 
   const cardsFetchStatus = useSelector<CardsSliceState, FetchStatus>((state) => state.cards.loadingStatus)
   const cardsFetchError = useSelector<CardsSliceState, string | undefined>((state) => state.cards.error)
@@ -68,7 +69,8 @@ export const Lanes = () => {
       <div className="lanes-parent">
         {lanes.map((lane, idx) => {
           const cardsInLane = (cards[lane.laneId] || { cards: [] })['cards']
-          return <div key={idx} className="lane-item"><p>{lane.name}</p><Cards cardData={cardsInLane} /></div>
+          return <Lane key={idx} lane={lane} cardData={cardsInLane} />
+          return <div key={idx} className="lane-item"><p>{lane.name}</p><Cards laneId={lane.laneId} cardData={cardsInLane} /></div>
         })}
       </div>
     </>
