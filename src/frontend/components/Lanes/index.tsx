@@ -4,14 +4,13 @@ import {
 } from '../../../deps-frontend.ts'
 import {
   fetchLanesAction,
-  LaneFetchStatus,
   LaneSliceState,
 } from '../../redux/laneSlice.ts'
 import {
   fetchCardsAction,
-  CardsFetchStatus,
   CardsSliceState,
 } from '../../redux/cardsSlice.ts'
+import { type FetchStatus } from '../../redux/slices.ts'
 import { StoreDispatch } from '../../redux/store.ts'
 import { Lane } from '../../../models/Lane.ts'
 import { GetCardsResponse } from '../../../models/Card.ts'
@@ -26,11 +25,12 @@ const { useEffect } = React
 export const Lanes = () => {
 
   const dispatch = useDispatch<StoreDispatch>()
-  const lanesFetchStatus = useSelector<LaneSliceState, LaneFetchStatus>((state) => state.lanes.status)
+  const lanesFetchStatus = useSelector<LaneSliceState, FetchStatus>((state) => state.lanes.loadingStatus)
+
   const lanesFetchError = useSelector<LaneSliceState, string | undefined>((state) => state.lanes.error)
   const lanes = useSelector<LaneSliceState, Lane[]>((state) => state.lanes.lanes)
 
-  const cardsFetchStatus = useSelector<CardsSliceState, CardsFetchStatus>((state) => state.cards.status)
+  const cardsFetchStatus = useSelector<CardsSliceState, FetchStatus>((state) => state.cards.loadingStatus)
   const cardsFetchError = useSelector<CardsSliceState, string | undefined>((state) => state.cards.error)
   const cards = useSelector<CardsSliceState, GetCardsResponse>((state) => state.cards.groupedCards)
 

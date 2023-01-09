@@ -11,7 +11,7 @@ const {
 
 export interface LaneState {
   lanes: Lane[],
-  status: FetchStatus,
+  loadingStatus: FetchStatus,
   error?: string
 }
 
@@ -21,7 +21,7 @@ export interface LaneSliceState {
 
 const initialState: LaneState = {
   lanes: [],
-  status: 'idle',
+  loadingStatus: 'idle',
 }
 
 export const fetchLanesAction = createAsyncThunk('lanes/fetchLanes', async () => {
@@ -36,15 +36,15 @@ const lanesSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchLanesAction.pending, (state, _action) => {
-        state.status = 'loading'
+        state.loadingStatus = 'loading'
       })
       .addCase(fetchLanesAction.fulfilled, (state, action) => {
-        state.status = 'succeeded'
+        state.loadingStatus = 'succeeded'
         console.log('payload', action.payload);
         state.lanes = action.payload
       })
       .addCase(fetchLanesAction.rejected, (state, action) => {
-        state.status = 'failed'
+        state.loadingStatus = 'failed'
         state.error = action.error.message
       })
   },
