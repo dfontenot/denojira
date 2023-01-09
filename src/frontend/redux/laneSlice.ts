@@ -2,17 +2,16 @@ import {
   ReduxToolkit,
 } from '../../deps-frontend.ts'
 import { Lane } from '../../models/Lane.ts'
+import { type FetchStatus } from './slices.ts'
 
 const {
   createAsyncThunk,
   createSlice
 } = ReduxToolkit
 
-export type LaneFetchStatus = 'idle' | 'loading' | 'succeeded' | 'failed'
-
 export interface LaneState {
   lanes: Lane[],
-  status: LaneFetchStatus,
+  status: FetchStatus,
   error?: string
 }
 

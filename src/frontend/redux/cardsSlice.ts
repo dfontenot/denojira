@@ -3,17 +3,16 @@ import {
 } from '../../deps-frontend.ts'
 import { GetCardsResponse } from '../../models/Card.ts'
 import { CreateCardRequest } from '../../handlers/CardsHandlers.ts'
+import { type FetchStatus } from './slices.ts'
 
 const {
   createAsyncThunk,
   createSlice
 } = ReduxToolkit
 
-export type CardsFetchStatus = 'idle' | 'loading' | 'succeeded' | 'failed'
-
 export interface CardsState {
   groupedCards: GetCardsResponse,
-  status: CardsFetchStatus,
+  status: FetchStatus,
   error?: string
 }
 
@@ -31,7 +30,6 @@ export const fetchCardsAction = createAsyncThunk('cards/fetchCards', async () =>
 })
 
 export const createCardAction = createAsyncThunk('cards/createCard', async (req: CreateCardRequest) => {
-  console.log('will create card')
   const result = await fetch('/api/card', {
     method: 'POST',
     headers: {
