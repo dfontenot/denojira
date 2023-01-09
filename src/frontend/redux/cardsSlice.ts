@@ -2,6 +2,7 @@ import {
   ReduxToolkit,
 } from '../../deps-frontend.ts'
 import { GetCardsResponse } from '../../models/Card.ts'
+import { CreateCardRequest } from '../../handlers/CardsHandlers.ts'
 
 const {
   createAsyncThunk,
@@ -29,6 +30,20 @@ export const fetchCardsAction = createAsyncThunk('cards/fetchCards', async () =>
   return (await fetch('/api/cards')).json()
 })
 
+export const createCardAction = createAsyncThunk('cards/createCard', async (req: CreateCardRequest) => {
+  console.log('will create card')
+  const result = await fetch('/api/card', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(req),
+  })
+
+  return result.json
+})
+
 const cardsSlice = createSlice({
   name: 'cards',
   initialState: initialState,
@@ -47,6 +62,16 @@ const cardsSlice = createSlice({
       .addCase(fetchCardsAction.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message
+      })
+      .addCase(createCardAction.pending, (state, _action) => {
+        console.log('create card pending')
+      })
+      .addCase(createCardAction.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        console.log('create card payload', action.payload);
+      })
+      .addCase(createCardAction.rejected, (state, action) => {
+        console.log('create card failed')
       })
   },
 })

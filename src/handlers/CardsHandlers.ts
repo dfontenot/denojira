@@ -32,9 +32,15 @@ const getCardsHandler = async (ctx: Oak.Context) => {
   ctx.response.body = serializeWithBigIntQuoted(grouped)
 }
 
+export interface CreateCardRequest {
+  title: string,
+  description: string,
+  laneId: number | string,
+}
+
 const createNewCardHandler = async (ctx: Oak.Context) => {
   const { value } = ctx.request.body({ type: 'json' })
-  const { title, description, laneId } = await value
+  const { title, description, laneId }: CreateCardRequest = await value
 
   ctx.response.headers.set('Content-Type', 'application/json')
 

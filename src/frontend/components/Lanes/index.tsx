@@ -34,6 +34,7 @@ export const Lanes = () => {
   const cardsFetchError = useSelector<CardsSliceState, string | undefined>((state) => state.cards.error)
   const cards = useSelector<CardsSliceState, GetCardsResponse>((state) => state.cards.groupedCards)
 
+  // TOOD: move up to app since card creation also depends on fetching this data
   useEffect(() => {
     if (lanesFetchStatus === 'idle') {
       console.log('will do lanes API call')
