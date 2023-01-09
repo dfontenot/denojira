@@ -12,17 +12,19 @@ const {
 
 export interface CardsState {
   groupedCards: GetCardsResponse,
-  status: FetchStatus,
-  error?: string
+  loadingStatus: FetchStatus,
+  error?: string,
+  cardCreationStatus: Record<string, FetchStatus>,
 }
 
 export interface CardsSliceState {
-  cards: CardsState
+  cards: CardsState,
 }
 
 const initialState: CardsState = {
   groupedCards: { },
-  status: 'idle',
+  loadingStatus: 'idle',
+  cardCreationStatus: {},
 }
 
 export const fetchCardsAction = createAsyncThunk('cards/fetchCards', async () => {
@@ -50,26 +52,28 @@ const cardsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchCardsAction.pending, (state, _action) => {
-        state.status = 'loading'
+        state.loadingStatus = 'loading'
       })
       .addCase(fetchCardsAction.fulfilled, (state, action) => {
-        state.status = 'succeeded'
+        state.loadingStatus = 'succeeded'
         console.log('payload', action.payload);
         state.groupedCards = action.payload
       })
       .addCase(fetchCardsAction.rejected, (state, action) => {
-        state.status = 'failed'
+        state.loadingStatus = 'failed'
         state.error = action.error.message
       })
-      .addCase(createCardAction.pending, (state, _action) => {
+      .addCase(createCardAction.pending, (state, action) => {
         console.log('create card pending')
+        state.cardCreationStatus[action.meta.requestId] = 'loading'
       })
       .addCase(createCardAction.fulfilled, (state, action) => {
-        state.status = 'succeeded'
         console.log('create card payload', action.payload);
+        state.cardCreationStatus[action.meta.requestId] = 'succeeded'
       })
       .addCase(createCardAction.rejected, (state, action) => {
         console.log('create card failed')
+        state.cardCreationStatus[action.meta.requestId] = 'failed'
       })
   },
 })
