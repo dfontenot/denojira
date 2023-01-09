@@ -2,6 +2,7 @@ import {
   React,
   ReactRedux,
 } from '../../../deps-frontend.ts'
+import { StoreDispatch } from '../../redux/store.ts'
 import { createCardAction } from '../../redux/cardsSlice.ts'
 import { LaneSliceState } from '../../redux/laneSlice.ts'
 import { Lane } from '../../../models/Lane.ts'
@@ -10,7 +11,10 @@ const {
   useRef,
   useState
 } = React
-const { useSelector } = ReactRedux
+const {
+  useDispatch,
+  useSelector
+} = ReactRedux
 
 interface State {
   title: string
@@ -19,6 +23,7 @@ interface State {
 
 export const CreateCard = () => {
 
+  const dispatch = useDispatch<StoreDispatch>()
   const formRef = useRef<HTMLFormElement>(null)
   const [state, setState] = useState<State>({ title: '', description: '' })
 
@@ -37,16 +42,16 @@ export const CreateCard = () => {
 
     const form = formRef.current as unknown as any // TODO: real type for this?
 
-    createCardAction({
+    dispatch(createCardAction({
       title: form['cardTitle'].value,
       description: form['description'].value,
       laneId: form['laneId'].value,
-    })
+    }))
 
     console.log('created card')
   }
 
-  return <form ref={formRef}>
+  return <form ref={formRef} onSubmit={doCreateCard}>
     <label htmlFor='cardTitle'>title: </label>
     <input type='text' name='cardTitle' value={state.title} onChange={(e) => updateTitle(e)} />
     <label>
@@ -55,6 +60,6 @@ export const CreateCard = () => {
     <select name='laneId'>
       {lanes.map((lane, idx) => <option key={idx} value={lane.laneId}>{lane.name}</option>)}
     </select>
-    <button onClick={doCreateCard}>Create</button>
+    <button type='submit'>Create</button>
     </form>
 }

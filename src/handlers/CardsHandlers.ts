@@ -44,7 +44,7 @@ const createNewCardHandler = async (ctx: Oak.Context) => {
 
   ctx.response.headers.set('Content-Type', 'application/json')
 
-  if (await Lane.where('id', `${laneId}`).count() <= 0) {
+  if (await Lane.where('id', `${laneId}`).groupBy('id').count() <= 0) {
     ctx.response.status = Oak.Status.BadRequest
     ctx.response.body = { 'error': 'no such lane id' }
   }
