@@ -1,5 +1,7 @@
 import React from 'https://esm.sh/react@18?target=es2020'
 export { React }
+export * as ReactDND from 'https://esm.sh/react-dnd@16?target=es2020'
+export * as ReactDNDHTML5 from 'https://esm.sh/react-dnd-html5-backend@16?target=es2020'
 export * as ReactDOMServer from 'https://esm.sh/react-dom@18/server?target=es2020'
 export * as ReactDOM from 'https://esm.sh/react-dom@18?target=es2020'
 export * as ReactRedux from 'https://esm.sh/react-redux@8.0?target=es2020'
