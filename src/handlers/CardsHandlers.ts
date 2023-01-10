@@ -7,6 +7,7 @@ import {
 } from '../db/models/index.ts'
 import { GetCardsResponse } from '../models/Card.ts'
 import { serializeWithBigIntQuoted } from './utils.ts'
+import db from '../db/db.ts'
 
 const getCardsHandler = async (ctx: Oak.Context) => {
 
@@ -47,15 +48,17 @@ const createNewCardHandler = async (ctx: Oak.Context) => {
 
   ctx.response.headers.set('Content-Type', 'application/json')
 
-  if (! doesLaneExist(laneId)) {
-    ctx.response.status = Oak.Status.BadRequest
-    ctx.response.body = { 'error': 'no such lane id' }
-  }
-  else {
-    const created = await Card.create({ title, description, laneId: `${laneId}` })
+  await db.transaction(async () => {
+    if (! doesLaneExist(laneId)) {
+      ctx.response.status = Oak.Status.BadRequest
+      ctx.response.body = { 'error': 'no such lane id' }
+    }
+    else {
+      const created = await Card.create({ title, description, laneId: `${laneId}` })
 
-    ctx.response.body = serializeWithBigIntQuoted(created)
-  }
+      ctx.response.body = serializeWithBigIntQuoted(created)
+    }
+  })
 }
 
 export interface MoveCardRequest {
@@ -67,26 +70,27 @@ const moveCardHandler = async (ctx: Oak.Context) => {
   const { value } = ctx.request.body({ type: 'json' })
   const { cardId, destinationLaneId }: MoveCardRequest = await value
 
-  if (! doesLaneExist(destinationLaneId)) {
-    ctx.response.status = Oak.Status.BadRequest
-    ctx.response.body = { 'error': 'no such lane id' }
-    return
-  }
+  await db.transaction(async () => {
+    if (! doesLaneExist(destinationLaneId)) {
+      ctx.response.status = Oak.Status.BadRequest
+      ctx.response.body = { 'error': 'no such lane id' }
+      return
+    }
 
-  const cardModel = Card.where('id', cardId)
-  const card = await cardModel.get()
+    const card = await Card.where('id', cardId).get()
 
-  if (! card) {
-    ctx.response.status = Oak.Status.BadRequest
-    ctx.response.body = { 'error': 'no such card id' }
-    return
-  }
+    if (! card) {
+      ctx.response.status = Oak.Status.BadRequest
+      ctx.response.body = { 'error': 'no such card id' }
+      return
+    }
 
-  // TODO: why doesn't this work?
-  //const updated = await cardModel.update({ laneId: destinationLaneId })
-  const updated = await Card.where('id', cardId).update({ laneId: destinationLaneId })
-  console.log('did update', updated) // NOTE: will always return [] due to https://github.com/eveningkid/denodb/issues/223#issuecomment-821556151
-  ctx.response.body = updated
+    // TODO: why doesn't this work?
+    //const updated = await cardModel.update({ laneId: destinationLaneId })
+    const updated = await Card.where('id', cardId).update({ laneId: destinationLaneId })
+    console.log('did update', updated) // NOTE: will always return [] due to https://github.com/eveningkid/denodb/issues/223#issuecomment-821556151
+    ctx.response.body = updated
+  })
 }
 
 export {
