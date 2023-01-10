@@ -4,6 +4,7 @@ export {
 } from './LanesHandlers.ts'
 export {
   createNewCardHandler,
+  deleteCardHandler,
   getCardsHandler,
   moveCardHandler,
 } from './CardsHandlers.ts'

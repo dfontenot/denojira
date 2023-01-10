@@ -93,8 +93,27 @@ const moveCardHandler = async (ctx: Oak.Context) => {
   })
 }
 
+const deleteCardHandler = async (ctx: Oak.Context) => {
+  const { cardId } = Oak.helpers.getQuery(ctx, { mergeParams: true })
+
+  await db.transaction(async () => {
+    const card = await Card.where('id', cardId).get()
+
+    if (! card) {
+      ctx.response.status = Oak.Status.BadRequest
+      ctx.response.body = { 'error': 'no such card id' }
+      return
+    }
+
+    const deleted = await Card.where('id', cardId).delete()
+    console.log('deleted', deleted)
+    ctx.response.body = deleted
+  })
+}
+
 export {
   createNewCardHandler,
+  deleteCardHandler,
   getCardsHandler,
   moveCardHandler,
 }

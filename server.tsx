@@ -14,6 +14,7 @@ import { App } from './src/frontend/App.tsx'
 import {
   createNewCardHandler,
   createNewLaneHandler,
+  deleteCardHandler,
   getCardsHandler,
   getLanesHandler,
   moveCardHandler,
@@ -85,6 +86,7 @@ router.post('/api/lane', createNewLaneHandler)
 router.get('/api/cards', getCardsHandler)
 router.post('/api/card', createNewCardHandler)
 router.put('/api/card/lane', moveCardHandler)
+router.delete('/api/card/:cardId', deleteCardHandler)
 
 // Logger
 app.use(async (ctx, next) => {
