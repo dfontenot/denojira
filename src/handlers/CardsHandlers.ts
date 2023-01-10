@@ -82,7 +82,11 @@ const moveCardHandler = async (ctx: Oak.Context) => {
     return
   }
 
-  // TODO: update lane id
+  // TODO: why doesn't this work?
+  //const updated = await cardModel.update({ laneId: destinationLaneId })
+  const updated = await Card.where('id', cardId).update({ laneId: destinationLaneId })
+  console.log('did update', updated) // NOTE: will always return [] due to https://github.com/eveningkid/denodb/issues/223#issuecomment-821556151
+  ctx.response.body = updated
 }
 
 export {

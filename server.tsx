@@ -16,6 +16,7 @@ import {
   createNewLaneHandler,
   getCardsHandler,
   getLanesHandler,
+  moveCardHandler,
 } from './src/handlers/index.ts'
 import db, { linkModels } from './src/db/db.ts'
 const {
@@ -83,6 +84,7 @@ router.post('/api/lane', createNewLaneHandler)
 
 router.get('/api/cards', getCardsHandler)
 router.post('/api/card', createNewCardHandler)
+router.put('/api/card/lane', moveCardHandler)
 
 // Logger
 app.use(async (ctx, next) => {

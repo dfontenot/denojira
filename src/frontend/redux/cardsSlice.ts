@@ -1,8 +1,11 @@
 import {
   ReduxToolkit,
 } from '../../deps-frontend.ts'
-import { GetCardsResponse } from '../../models/Card.ts'
-import { CreateCardRequest } from '../../handlers/CardsHandlers.ts'
+import { type GetCardsResponse } from '../../models/Card.ts'
+import {
+  type CreateCardRequest,
+  type MoveCardRequest,
+} from '../../handlers/CardsHandlers.ts'
 import { type FetchStatus } from './slices.ts'
 
 const {
@@ -11,10 +14,11 @@ const {
 } = ReduxToolkit
 
 export interface CardsState {
-  groupedCards: GetCardsResponse,
-  loadingStatus: FetchStatus,
-  error?: string,
-  cardCreationStatus: Record<string, FetchStatus>,
+  groupedCards: GetCardsResponse
+  loadingStatus: FetchStatus
+  error?: string
+  cardCreationStatus: Record<string, FetchStatus>
+  moveCardStatus: Record<string, FetchStatus>
 }
 
 export interface CardsSliceState {
@@ -25,6 +29,7 @@ const initialState: CardsState = {
   groupedCards: { },
   loadingStatus: 'idle',
   cardCreationStatus: {},
+  moveCardStatus: {},
 }
 
 export const fetchCardsAction = createAsyncThunk('cards/fetchCards', async () => {
@@ -34,6 +39,19 @@ export const fetchCardsAction = createAsyncThunk('cards/fetchCards', async () =>
 export const createCardAction = createAsyncThunk('cards/createCard', async (req: CreateCardRequest) => {
   const result = await fetch('/api/card', {
     method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(req),
+  })
+
+  return result.json
+})
+
+export const moveCardAction = createAsyncThunk('cards/moveCard', async (req: MoveCardRequest) => {
+  const result = await fetch('/api/card/lane', {
+    method: 'PUT',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
@@ -74,6 +92,18 @@ const cardsSlice = createSlice({
       .addCase(createCardAction.rejected, (state, action) => {
         console.log('create card failed')
         state.cardCreationStatus[action.meta.requestId] = 'failed'
+      })
+      .addCase(moveCardAction.pending, (state, action) => {
+        console.log('move card pending')
+        state.moveCardStatus[action.meta.requestId] = 'loading'
+      })
+      .addCase(moveCardAction.fulfilled, (state, action) => {
+        console.log('move card payload', action.payload);
+        state.moveCardStatus[action.meta.requestId] = 'succeeded'
+      })
+      .addCase(moveCardAction.rejected, (state, action) => {
+        console.log('move card failed')
+        state.moveCardStatus[action.meta.requestId] = 'failed'
       })
   },
 })

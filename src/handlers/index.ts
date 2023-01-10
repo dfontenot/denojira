@@ -5,4 +5,5 @@ export {
 export {
   createNewCardHandler,
   getCardsHandler,
+  moveCardHandler,
 } from './CardsHandlers.ts'
