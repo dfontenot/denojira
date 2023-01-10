@@ -10,11 +10,20 @@ const {
 } = ReduxToolkit
 
 const cardCreationListenerMiddleware = createListenerMiddleware()
-
 cardCreationListenerMiddleware.startListening({
   type: 'cards/createCard/fulfilled', // TODO: standard and more rename-friendly way of passing around this identifier?
   effect: (_action, listenerApi) => {
-    console.log('in the card reloading middleware')
+    console.log('in the card creation reloading middleware')
+
+    listenerApi.dispatch(fetchCardsAction())
+  },
+})
+
+const cardMovedListenerMiddleware = createListenerMiddleware()
+cardMovedListenerMiddleware.startListening({
+  type: 'cards/moveCard/fulfilled', // TODO: standard and more rename-friendly way of passing around this identifier?
+  effect: (_action, listenerApi) => {
+    console.log('in the card moved reloading middleware')
 
     listenerApi.dispatch(fetchCardsAction())
   },
@@ -27,7 +36,9 @@ export const store = configureStore({
   },
   devTools: true,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().prepend(cardCreationListenerMiddleware.middleware),
+    getDefaultMiddleware().prepend(
+      cardCreationListenerMiddleware.middleware,
+      cardMovedListenerMiddleware.middleware,),
 })
 
 // source: https://stackoverflow.com/a/73151014/854854
