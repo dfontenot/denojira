@@ -3,8 +3,10 @@ import {
   ESBuild,
   ESBuildDenoLoader,
   Mustache,
-  Path,
   Oak,
+  Path,
+  postcss,
+  tailwind,
 } from './src/deps-backend.ts'
 import {
   React,
@@ -52,6 +54,24 @@ router.get('/old/static/app.js', async (ctx) => {
 
   ctx.response.headers.set('Content-Type', 'text/javascript')
   ctx.response.body = code
+})
+
+router.get('/static/index.css', async (ctx) => {
+  // source: https://github.com/tailwindlabs/tailwindcss/discussions/1442#discussioncomment-4103374
+  const processed = await postcss([
+    tailwind({
+      content: ['./src/frontend/**/*.{ts,tsx}'],
+      theme: {
+        extend: {},
+      },
+      plugins: [],
+    })
+  ]).process('@tailwind base;@tailwind components;@tailwind utilities;', {
+    from: undefined,
+  })
+
+  ctx.response.headers.set('Content-Type', 'text/css')
+  ctx.response.body = processed.css
 })
 
 router.get('/static/app.css', async (ctx) => {
