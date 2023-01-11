@@ -1,4 +1,5 @@
 import {
+  autoprefixer,
   DenoEmit,
   ESBuild,
   ESBuildDenoLoader,
@@ -59,6 +60,7 @@ router.get('/old/static/app.js', async (ctx) => {
 router.get('/static/index.css', async (ctx) => {
   // source: https://github.com/tailwindlabs/tailwindcss/discussions/1442#discussioncomment-4103374
   const processed = await postcss([
+    autoprefixer,
     tailwind({
       content: ['./src/frontend/**/*.{ts,tsx}'],
       theme: {
@@ -68,7 +70,7 @@ router.get('/static/index.css', async (ctx) => {
     })
   ]).process('@tailwind base;@tailwind components;@tailwind utilities;', {
     from: undefined,
-  })
+  }).async()
 
   ctx.response.headers.set('Content-Type', 'text/css')
   ctx.response.body = processed.css

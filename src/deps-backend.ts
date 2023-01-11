@@ -7,7 +7,9 @@ export * as Oak from 'https://deno.land/x/oak@v11.1.0/mod.ts'
 export * as Path from 'https://deno.land/std/path/mod.ts'
 import tailwind from 'https://esm.sh/tailwindcss@3'
 import postcss from 'https://esm.sh/v102/postcss@8.4.20/lib/postcss'
+import autoprefixer from 'https://esm.sh/autoprefixer@10'
 export {
+  autoprefixer,
   postcss,
   tailwind,
 }
