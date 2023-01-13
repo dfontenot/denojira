@@ -6,8 +6,6 @@ import {
   Mustache,
   Oak,
   Path,
-  postcss,
-  postcssWindicss,
 } from './src/deps-backend.ts'
 import {
   React,
@@ -58,17 +56,9 @@ router.get('/old/static/app.js', async (ctx) => {
 })
 
 router.get('/static/index.css', async (ctx) => {
-  // source: https://github.com/tailwindlabs/tailwindcss/discussions/1442#discussioncomment-4103374
-  postcssWindicss.
-  const processed = await postcss([
-    autoprefixer,
-    (new Windicss()),
-  ]).process('@tailwind base;@tailwind components;@tailwind utilities;', {
-    from: undefined,
-  }).async()
 
   ctx.response.headers.set('Content-Type', 'text/css')
-  ctx.response.body = processed.css
+  ctx.response.body = 'TODO'
 })
 
 router.get('/static/app.css', async (ctx) => {
