@@ -6,13 +6,18 @@ export * as Mustache from 'https://deno.land/x/mustache@v0.3.0/mod.ts'
 export * as Oak from 'https://deno.land/x/oak@v11.1.0/mod.ts'
 export * as Path from 'https://deno.land/std/path/mod.ts'
 //import tailwind from 'https://esm.sh/tailwindcss@3'
-import tailwind from 'npm:tailwindcss@^3.2.4'
-import postcss from 'https://esm.sh/v102/postcss@8.4.20/lib/postcss'
+// import tailwindcss from "https://esm.sh/tailwindcss@2.0.4?external=postcss@8.2.8"
+//import tailwind from 'npm:tailwindcss@^3.2.4'
+//import Windicss from 'https://esm.sh/windicss@3.5'
+export * as Windicss from 'https://esm.sh/windicss@3.5/helpers'
+//import postcssWindicss from 'https://esm.sh/postcss-windicss@1' // esm.sh 500 error for this package
+import postcssWindicss from 'npm:postcss-windicss@^1.0.0'
+import postcss from 'https://deno.land/x/postcss/mod.js'
 import autoprefixer from 'https://esm.sh/autoprefixer@10'
 export {
   autoprefixer,
   postcss,
-  tailwind,
+  postcssWindicss,
 }
 
 // considered backend only for renderToString

@@ -7,7 +7,7 @@ import {
   Oak,
   Path,
   postcss,
-  tailwind,
+  postcssWindicss,
 } from './src/deps-backend.ts'
 import {
   React,
@@ -59,15 +59,10 @@ router.get('/old/static/app.js', async (ctx) => {
 
 router.get('/static/index.css', async (ctx) => {
   // source: https://github.com/tailwindlabs/tailwindcss/discussions/1442#discussioncomment-4103374
+  postcssWindicss.
   const processed = await postcss([
     autoprefixer,
-    tailwind({
-      content: ['./src/frontend/**/*.{ts,tsx}'],
-      theme: {
-        extend: {},
-      },
-      plugins: [],
-    })
+    (new Windicss()),
   ]).process('@tailwind base;@tailwind components;@tailwind utilities;', {
     from: undefined,
   }).async()
