@@ -57,6 +57,7 @@ router.get('/old/static/app.js', async (ctx) => {
 
 router.get('/static/index.css', async (ctx) => {
 
+  ctx.response.status = Oak.Status.NotFound
   ctx.response.headers.set('Content-Type', 'text/css')
   ctx.response.body = 'TODO'
 })

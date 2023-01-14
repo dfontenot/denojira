@@ -65,12 +65,12 @@ export const Lanes = () => {
   }
 
   return <>
-      <p>{content}</p>
-      <div className="lanes-parent">
+      <p>foo {content}</p>
+      <div className='flex'>
         {lanes.map((lane, idx) => {
           const cardsInLane = (cards[lane.laneId] || { cards: [] })['cards']
           return <Lane key={idx} lane={lane} cardData={cardsInLane} />
-          return <div key={idx} className="lane-item"><p>{lane.name}</p><Cards laneId={lane.laneId} cardData={cardsInLane} /></div>
+          return <div key={idx} className='lane-item'><p>{lane.name}</p><Cards laneId={lane.laneId} cardData={cardsInLane} /></div>
         })}
       </div>
     </>
