@@ -20,7 +20,6 @@ import {
   getLanesHandler,
   moveCardHandler,
 } from './src/handlers/index.ts'
-import db, { linkModels } from './src/db/db.ts'
 const {
   Application,
   Router,
@@ -30,12 +29,6 @@ const { renderToString } = ReactDOMServer
 const app = new Application()
 
 const router = new Router()
-
-// only want to call this if stuff actually changes
-// (if using FKs, this call will still try to redeclare them which postgres does not like)
-// see: https://github.com/eveningkid/denodb/issues/101
-//await db.sync()
-linkModels()
 
 router.get('/', async (ctx) => {
   const reactSSRApp = renderToString(<App />)

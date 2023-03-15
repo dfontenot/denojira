@@ -1,32 +1,26 @@
-#!/usr/bin/env -S deno run --allow-net --allow-read
+#!/usr/bin/env -S deno run --allow-net --allow-read --allow-env
 
-import { Dexecutor } from '../src/deps-backend.ts'
+import { Postgres } from '../src/deps-backend.ts'
 import {
   cardsCreateTableQuery,
   lanesCreateTableQuery,
 } from '../src/db/schema.ts'
 
-
 (async() => {
-  console.log(Dexecutor)
   console.log(`will run ${lanesCreateTableQuery.toString()}`)
   console.log(`will run ${cardsCreateTableQuery.toString()}`)
 
-  console.log(Dexecutor)
-  const dexecutor = new Dexecutor({
-    client: 'postgres',
-    connection: {
-      host: 'localhost',
-      username: 'postgres',
-      password: 'password',
-      database: 'denojira',
-    }
+  const client = new Postgres.Client({
+    hostname: 'localhost',
+    user: 'postgres',
+    password: 'password',
+    database: 'denojira',
   })
 
-  await dexecutor.connect()
+  await client.connect()
 
-  await dexecutor.execute(lanesCreateTableQuery.toString())
-  await dexecutor.execute(cardsCreateTableQuery.toString())
+  console.log('create lanes result', await client.queryObject(lanesCreateTableQuery.toString()))
+  console.log('create cards result', await client.queryObject(cardsCreateTableQuery.toString()))
 
-  await dexecutor.close()
+  await client.end()
 })()

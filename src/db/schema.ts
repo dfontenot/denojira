@@ -2,6 +2,9 @@ import { Dex } from '../deps-backend.ts'
 
 const dex = Dex({ client: 'postgres' })
 
+// NOTE: this won't work if the table exists because it needs a CASCADE in the drop table
+// TODO: do a hack around this for now
+// see: https://github.com/knex/knex/issues/974
 export const lanesCreateTableQuery = dex.schema.dropTableIfExists('lanes').createTable('lanes', (table) => {
   table.increments('id').primary()
   table.string('name', 256)
