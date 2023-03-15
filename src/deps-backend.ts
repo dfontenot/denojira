@@ -1,6 +1,7 @@
 import Dex from 'https://deno.land/x/dex@1.0.2/mod.ts'
 export { Dex }
-export * as Dexecutor from 'https://deno.land/x/dexecutor@1.0.0/mod.ts'
+import Dexecutor from 'https://deno.land/x/dexecutor@1.0.0/mod.ts'
+export { Dexecutor }
 export * as DenoEmit from 'https://deno.land/x/emit@0.11.0/mod.ts'
 export * as ESBuild from 'https://deno.land/x/esbuild@v0.15.16/mod.js'
 export * as ESBuildDenoLoader from 'https://deno.land/x/esbuild_deno_loader@0.6.0/mod.ts'

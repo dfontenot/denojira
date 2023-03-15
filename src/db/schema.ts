@@ -2,16 +2,14 @@ import { Dex } from '../deps-backend.ts'
 
 const dex = Dex({ client: 'postgres' })
 
-const lanesCreateTableQuery = dex.schema.createTable('lanes', (table) => {
+export const lanesCreateTableQuery = dex.schema.dropTableIfExists('lanes').createTable('lanes', (table) => {
   table.increments('id').primary()
   table.string('name', 256)
   table.boolean('enabled')
   table.timestamps(true, true, false)
 })
 
-console.log(lanesCreateTableQuery)
-
-const cardsCreateTableQuery = dex.schema.createTable('cards', (table) => {
+export const cardsCreateTableQuery = dex.schema.dropTableIfExists('cards').createTable('cards', (table) => {
   table.increments('id').primary()
   table.string('title', 256)
   table.text('description')
@@ -19,6 +17,4 @@ const cardsCreateTableQuery = dex.schema.createTable('cards', (table) => {
   table.foreign('lane_id').references('id').inTable('lanes')
   table.timestamps(true, true, false)
 })
-
-console.log(cardsCreateTableQuery.toString())
 
