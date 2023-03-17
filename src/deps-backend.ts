@@ -26,3 +26,4 @@ export * as Postgres from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
 import React from 'https://esm.sh/react@18'
 export { React }
 export * as ReactDOMServer from 'https://esm.sh/react-dom@18/server'
+export * as Reflect from 'https://deno.land/x/reflect_metadata@v0.1.12/mod.ts'
