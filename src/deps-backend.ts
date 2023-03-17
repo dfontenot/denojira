@@ -1,11 +1,12 @@
 import Dex from 'https://deno.land/x/dex@1.0.2/mod.ts'
 export { Dex }
-export * as Postgres from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
 export * as ESBuild from 'https://deno.land/x/esbuild@v0.15.16/mod.js'
 export * as ESBuildDenoLoader from 'https://deno.land/x/esbuild_deno_loader@0.6.0/mod.ts'
+export * as Inversify from 'https://esm.sh/inversify@6'
 export * as Mustache from 'https://deno.land/x/mustache@v0.3.0/mod.ts'
 export * as Oak from 'https://deno.land/x/oak@v11.1.0/mod.ts'
 export * as Path from 'https://deno.land/std/path/mod.ts'
+export * as Postgres from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
 //import tailwind from 'https://esm.sh/tailwindcss@3'
 // import tailwindcss from "https://esm.sh/tailwindcss@2.0.4?external=postcss@8.2.8"
 //import tailwind from 'npm:tailwindcss@^3.2.4'
