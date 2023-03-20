@@ -19,11 +19,14 @@ interface RawLaneRow {
   updated_at: Date,
 }
 
+type PoolOrTx = Postgres.Pool | Postgres.Transaction
+type PoolClientOrTx = Postgres.PoolClient | Postgres.Transaction
+
 @injectable()
 export class LaneRepository {
   private qb
 
-  constructor(@inject(DbConnectionPoolId) private pool: Postgres.Pool | Postgres.Client) {
+  constructor(@inject(DbConnectionPoolId) private pool: PoolOrTx) {
     this.qb = Dex({ client: 'postgres' })
   }
 
@@ -51,13 +54,13 @@ export class LaneRepository {
     }
   }
 
-  private async queryWithClient<T>(cb: (client: Postgres.QueryClient) => Promise<T>): Promise<T> {
+  private async queryWithClient<T>(cb: (client: PoolClientOrTx) => Promise<T>): Promise<T> {
 
-    if (this.pool instanceof Postgres.PoolClient) {
+    if (this.pool instanceof Postgres.Pool) {
       return await this.queryWithPool(cb)
     }
     else {
-      return await cb(this.pool as Postgres.Client)
+      return await cb(this.pool as Postgres.Transaction)
     }
   }
 
@@ -66,6 +69,16 @@ export class LaneRepository {
 
       const query = this.qb('lanes').select('1').where('id', `${laneId}`).groupBy('id')
       console.log('lane exists query', query.toString())
+
+      return (await client.queryObject(query.toString())).rows.length > 1
+    })
+  }
+
+  async isLaneDisabled(laneId: number | string): Promise<boolean> {
+    return await this.queryWithClient(async (client) => {
+
+      const query = this.qb('lanes').select('1').where({'id': `${laneId}`, 'is_enabled': false }).groupBy('id')
+      console.log('lane is disabled query', query.toString())
 
       return (await client.queryObject(query.toString())).rows.length > 1
     })
