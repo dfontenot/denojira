@@ -9,7 +9,7 @@ import { DbConnectionPoolId } from '../../types.ts'
 const {
   inject,
   injectable,
-}  = Inversify
+} = Inversify
 
 interface RawLaneRow {
   id: number,
@@ -19,12 +19,11 @@ interface RawLaneRow {
   updated_at: Date,
 }
 
-
 @injectable()
 export class LaneRepository {
   private qb
 
-  constructor(@inject(DbConnectionPoolId) private pool: Postgres.Pool) {
+  constructor(@inject(DbConnectionPoolId) private pool: Postgres.Pool | Postgres.Client) {
     this.qb = Dex({ client: 'postgres' })
   }
 
@@ -41,9 +40,10 @@ export class LaneRepository {
   private async queryWithPool<T>(cb: (client: Postgres.PoolClient) => Promise<T>): Promise<T> {
 
     let client: Postgres.PoolClient | null = null
+    const pool = this.pool as Postgres.Pool
 
     try {
-      client = await this.pool.connect()
+      client = await pool.connect()
       return await cb(client)
     }
     finally {
@@ -51,8 +51,18 @@ export class LaneRepository {
     }
   }
 
+  private async queryWithClient<T>(cb: (client: Postgres.QueryClient) => Promise<T>): Promise<T> {
+
+    if (this.pool instanceof Postgres.PoolClient) {
+      return await this.queryWithPool(cb)
+    }
+    else {
+      return await cb(this.pool as Postgres.Client)
+    }
+  }
+
   async doesLaneExist(laneId: number | string): Promise<boolean> {
-    return await this.queryWithPool(async (client) => {
+    return await this.queryWithClient(async (client) => {
 
       const query = this.qb('lanes').select('1').where('id', `${laneId}`).groupBy('id')
       console.log('lane exists query', query.toString())
@@ -62,7 +72,7 @@ export class LaneRepository {
   }
 
   async createLane(name: string, isEnabled = true): Promise<Lane> {
-    return await this.queryWithPool(async (client) => {
+    return await this.queryWithClient(async (client) => {
 
       const insertQuery = this.qb('lanes').insert([{ name, is_enabled: isEnabled }], ['id'])
       const result = await client.queryObject(insertQuery.toString())
@@ -73,7 +83,7 @@ export class LaneRepository {
   }
 
   async getAllLanes(): Promise<Lane[]> {
-    return await this.queryWithPool(async (client) => {
+    return await this.queryWithClient(async (client) => {
       const result = await client.queryObject(this.qb('lanes').select('*').toString())
       return result.rows.map((row: unknown) => this.laneMapper(row as RawLaneRow))
     })
