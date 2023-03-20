@@ -38,13 +38,13 @@ export class LaneRepository {
     }
   }
 
-  private async queryObjectWithPool<T>(cb: (client: Postgres.PoolClient) => T): Promise<T> {
+  private async queryWithPool<T>(cb: (client: Postgres.PoolClient) => Promise<T>): Promise<T> {
 
     let client: Postgres.PoolClient | null = null
 
     try {
       client = await this.pool.connect()
-      return cb(client)
+      return await cb(client)
     }
     finally {
       client?.release()
@@ -52,43 +52,30 @@ export class LaneRepository {
   }
 
   async doesLaneExist(laneId: number | string): Promise<boolean> {
-    const client = await this.pool.connect()
+    return await this.queryWithPool(async (client) => {
 
-    try {
       const query = this.qb('lanes').select('1').where('id', `${laneId}`).groupBy('id')
       console.log('lane exists query', query.toString())
 
       return (await client.queryObject(query.toString())).rows.length > 1
-    }
-    finally {
-      client.release()
-    }
+    })
   }
 
   async createLane(name: string, isEnabled = true): Promise<Lane> {
-    const client = await this.pool.connect()
+    return await this.queryWithPool(async (client) => {
 
-    try {
       const insertQuery = this.qb('lanes').insert([{ name, is_enabled: isEnabled }], ['id'])
       const result = await client.queryObject(insertQuery.toString())
       console.log('created lane', result)
 
       return this.laneMapper(result.rows[0] as RawLaneRow)
-    }
-    finally {
-      client.release()
-    }
+    })
   }
 
   async getAllLanes(): Promise<Lane[]> {
-    const client = await this.pool.connect()
-
-    try {
+    return await this.queryWithPool(async (client) => {
       const result = await client.queryObject(this.qb('lanes').select('*').toString())
       return result.rows.map((row: unknown) => this.laneMapper(row as RawLaneRow))
-    }
-    finally {
-      client.release()
-    }
+    })
   }
 }
