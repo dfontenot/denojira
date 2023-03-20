@@ -2,12 +2,11 @@ import {
   Oak,
 } from '../deps-backend.ts'
 import {
-  Card,
-  Lane,
-} from '../db/models/index.ts'
+  doesLaneExist,
+} from '../db/repository/LaneRepository.ts'
+import { pool } from '../db/connection.ts'
 import { GetCardsResponse } from '../models/Card.ts'
 import { serializeWithBigIntQuoted } from './utils.ts'
-import db from '../db/db.ts'
 
 const getCardsHandler = async (ctx: Oak.Context) => {
 
@@ -39,15 +38,28 @@ export interface CreateCardRequest {
   laneId: number | string,
 }
 
-// see https://stackoverflow.com/a/10841867/854854
-const doesLaneExist = async (laneId: number | string) => await Lane.where('id', `${laneId}`).groupBy('id').count() > 0
-
 const createNewCardHandler = async (ctx: Oak.Context) => {
   const { value } = ctx.request.body({ type: 'json' })
   const { title, description, laneId }: CreateCardRequest = await value
 
   ctx.response.headers.set('Content-Type', 'application/json')
 
+  const client = await pool.connect()
+  try {
+    const tx = client.createTransactions('create_card', { isolation_level: 'repeatable_read' })
+
+    await tx.begin()
+    try {
+      tx.commit()
+    }
+    catch (e) {
+      console.log('error during transaction, rolling back', e)
+      await tx.rollback()
+    }
+  }
+  finally {
+    client.release()
+  }
   await db.transaction(async () => {
     if (! doesLaneExist(laneId)) {
       ctx.response.status = Oak.Status.BadRequest
