@@ -23,6 +23,26 @@ interface RawCardRow {
   updated_at: Date,
 }
 
+interface RawCardInLane {
+  card_id: number,
+  title: string,
+  description: string,
+  card_created_at: Date,
+  card_updated_at: Date,
+  lane_id: number,
+  lane_name: string,
+}
+
+export interface CardInLane {
+  cardId: number,
+  title: string,
+  description: string,
+  cardCreatedAt: Date,
+  cardUpdatedAt: Date,
+  laneId: number,
+  laneName: string,
+}
+
 @injectable()
 export class CardRepository {
   private qb
@@ -41,6 +61,18 @@ export class CardRepository {
       enabled: row['is_enabled'],
       createdAt: row['created_at'],
       updatedAt: row['updated_at'],
+    }
+  }
+
+  private cardInLaneMapper(row: RawCardInLane): CardInLane {
+    return {
+      cardId: row['card_id'],
+      title: row['title'],
+      description: row['description'],
+      cardCreatedAt: row['card_created_at'],
+      cardUpdatedAt: row['card_updated_at'],
+      laneId: row['lane_id'],
+      laneName: row['lane_name'],
     }
   }
 
@@ -68,7 +100,7 @@ export class CardRepository {
     }
   }
 
-  async moveCard(cardId: number | string, laneId: number | string): Card {
+  async moveCard(cardId: number | string, laneId: number | string): Promise<Card> {
     return await this.queryWithClient(async (client: Postgres.QueryClient) => {
 
       const tx = client.createTransaction(`move_card_${cardId}_to_${laneId}`, { isolation_level: 'repeatable_read' })
@@ -86,6 +118,24 @@ export class CardRepository {
       tx.commit()
 
       return this.cardMapper(results.rows[0] as RawCardRow)
+    })
+  }
+
+  async getAllCardsInLanes(): Promise<CardInLane[]> {
+    return await this.queryWithClient(async (client: Postgres.QueryClient) => {
+
+      const query = this.qb('cards').select('cards.id as card_id',
+        'title',
+        'description',
+        'cards.created_at as card_created_at',
+        'cards.updated_at as card_updated_at',
+        'lanes.id as lane_id',
+        'name as lane_name'
+      ).innerJoin('lanes', 'cards.lane_id', 'lanes.id')
+
+      const results = await client.queryObject(query)
+
+      return this.cardInRowMapper(results.rows[0] as RawCardInLane)
     })
   }
 }

@@ -2,28 +2,36 @@ import {
   Oak,
 } from '../deps-backend.ts'
 import {
-  doesLaneExist,
+  CardRepository,
+  type CardInLane,
+} from '../db/repository/CardRepository.ts'
+import {
+  LaneRepository,
 } from '../db/repository/LaneRepository.ts'
 import { pool } from '../db/connection.ts'
-import { GetCardsResponse } from '../models/Card.ts'
+import {
+  CardResponse,
+  GetCardsResponse
+} from '../models/Card.ts'
 import { serializeWithBigIntQuoted } from './utils.ts'
+
+// TODO: move once all handlers under invserify
+const cardRepository = new CardRepository(pool, (tx) => new LaneRepository(tx))
 
 const getCardsHandler = async (ctx: Oak.Context) => {
 
-  //const joinedResults = await Card.join(Lane, Lane.field('id'), Card.field('lane_id')).get()
-  const joinedResults = await Card.select(Card.field('id', 'cardId'), 'name', 'laneId', 'title', 'description')
-    .join(Lane.select(Lane.field('id', 'laneId'), 'name', 'enabled'), Lane.field('id'), Card.field('lane_id')).get()
+  const joinedResults = await cardRepository.getAllCardsInLanes()
 
   // TODO: clean up typing errors
-  const grouped = joinedResults.reduce<GetCardsResponse>((acc, row) => {
+  const grouped = joinedResults.reduce<GetCardsResponse>((acc: GetCardsResponse, row: CardInLane) => {
     const key = `${row.laneId}`
-    const newCard = { id: row.cardId, title: row.title, description: row.description }
+    const newCard: CardResponse = { id: row.cardId, title: row.title, description: row.description }
 
-    if (acc.hasOwnProperty(key)) {
+    if (acc[key]) {
       acc[key].cards.push(newCard)
     }
     else {
-      acc[key] = { laneName: row.name, cards: [newCard] }
+      acc[key] = { laneName: row.laneName, cards: [newCard] }
     }
 
     return acc
