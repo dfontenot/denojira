@@ -148,4 +148,14 @@ export class CardRepository {
       return this.cardMapper(results.rows[0] as RawCardRow)
     })
   }
+
+  async deleteCard(cardId: number | string): Promise<boolean> {
+    return await this.queryWithClient(async (client: Postgres.QueryClient) => {
+
+      const query = this.qb('cards').where('id', cardId).delete()
+      const results = await client.queryObject(query)
+
+      return (results.rowCount || 0) == 1
+    })
+  }
 }

@@ -65,45 +65,21 @@ const moveCardHandler = async (ctx: Oak.Context) => {
   const { value } = ctx.request.body({ type: 'json' })
   const { cardId, destinationLaneId }: MoveCardRequest = await value
 
-  await db.transaction(async () => {
-    if (! doesLaneExist(destinationLaneId)) {
-      ctx.response.status = Oak.Status.BadRequest
-      ctx.response.body = { 'error': 'no such lane id' }
-      return
-    }
-
-    const card = await Card.where('id', cardId).get()
-
-    if (! card) {
-      ctx.response.status = Oak.Status.BadRequest
-      ctx.response.body = { 'error': 'no such card id' }
-      return
-    }
-
-    // TODO: why doesn't this work?
-    //const updated = await cardModel.update({ laneId: destinationLaneId })
-    const updated = await Card.where('id', cardId).update({ laneId: destinationLaneId })
-    console.log('did update', updated) // NOTE: will always return [] due to https://github.com/eveningkid/denodb/issues/223#issuecomment-821556151
-    ctx.response.body = updated
-  })
+  const updated = await cardRepository.moveCard(cardId, destinationLaneId)
+  ctx.response.body = updated
 }
 
 const deleteCardHandler = async (ctx: Oak.Context) => {
   const { cardId } = Oak.helpers.getQuery(ctx, { mergeParams: true })
+  const deletionResult = await cardRepository.deleteCard(cardId)
 
-  await db.transaction(async () => {
-    const card = await Card.where('id', cardId).get()
-
-    if (! card) {
-      ctx.response.status = Oak.Status.BadRequest
-      ctx.response.body = { 'error': 'no such card id' }
-      return
-    }
-
-    const deleted = await Card.where('id', cardId).delete()
-    console.log('deleted', deleted)
-    ctx.response.body = deleted
-  })
+  if (! deletionResult) {
+    ctx.response.status = Oak.Status.NotFound
+    ctx.response.body = { error: `no such card id '${cardId}'` }
+  }
+  else {
+    ctx.response.body = { deleted: deletionResult }
+  }
 }
 
 export {
