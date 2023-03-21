@@ -52,33 +52,8 @@ const createNewCardHandler = async (ctx: Oak.Context) => {
 
   ctx.response.headers.set('Content-Type', 'application/json')
 
-  const client = await pool.connect()
-  try {
-    const tx = client.createTransactions('create_card', { isolation_level: 'repeatable_read' })
-
-    await tx.begin()
-    try {
-      tx.commit()
-    }
-    catch (e) {
-      console.log('error during transaction, rolling back', e)
-      await tx.rollback()
-    }
-  }
-  finally {
-    client.release()
-  }
-  await db.transaction(async () => {
-    if (! doesLaneExist(laneId)) {
-      ctx.response.status = Oak.Status.BadRequest
-      ctx.response.body = { 'error': 'no such lane id' }
-    }
-    else {
-      const created = await Card.create({ title, description, laneId: `${laneId}` })
-
-      ctx.response.body = serializeWithBigIntQuoted(created)
-    }
-  })
+  const created = await cardRepository.createCard(title, description, laneId)
+  ctx.response.body = serializeWithBigIntQuoted(created)
 }
 
 export interface MoveCardRequest {

@@ -135,7 +135,17 @@ export class CardRepository {
 
       const results = await client.queryObject(query)
 
-      return this.cardInRowMapper(results.rows[0] as RawCardInLane)
+      return results.rows.map((row) => this.cardInLaneMapper(row as RawCardInLane))
+    })
+  }
+
+  async createCard(title: string, description: string, laneId: number | string): Promise<Card> {
+    return await this.queryWithClient(async (client: Postgres.QueryClient) => {
+
+      const query = this.qb('cards').insert({ title, description, lane_id: laneId }, ['id', 'title', 'description', 'created_at', 'updated_at'])
+      const results = await client.queryObject(query)
+
+      return this.cardMapper(results.rows[0] as RawCardRow)
     })
   }
 }
