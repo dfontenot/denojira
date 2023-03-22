@@ -122,7 +122,7 @@ export class DbCardRepository implements CardRepository {
       }
 
       const query = this.qb('cards').update('lane_id', parseInt(`${laneId}`, 10), ['*'])
-      const results = await tx.queryObject(query)
+      const results = await tx.queryObject(query.toString())
 
       tx.commit()
 
@@ -142,7 +142,7 @@ export class DbCardRepository implements CardRepository {
         'name as lane_name'
       ).innerJoin('lanes', 'cards.lane_id', 'lanes.id')
 
-      const results = await client.queryObject(query)
+      const results = await client.queryObject(query.toString())
 
       return results.rows.map((row) => this.cardInLaneMapper(row as RawCardInLane))
     })
@@ -152,7 +152,7 @@ export class DbCardRepository implements CardRepository {
     return await this.queryWithClient(async (client: Postgres.QueryClient) => {
 
       const query = this.qb('cards').insert({ title, description, lane_id: laneId }, ['id', 'title', 'description', 'created_at', 'updated_at'])
-      const results = await client.queryObject(query)
+      const results = await client.queryObject(query.toString())
 
       return this.cardMapper(results.rows[0] as RawCardRow)
     })
@@ -162,7 +162,7 @@ export class DbCardRepository implements CardRepository {
     return await this.queryWithClient(async (client: Postgres.QueryClient) => {
 
       const query = this.qb('cards').where('id', cardId).delete()
-      const results = await client.queryObject(query)
+      const results = await client.queryObject(query.toString())
 
       return (results.rowCount || 0) == 1
     })
