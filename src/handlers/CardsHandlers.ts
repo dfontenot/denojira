@@ -15,10 +15,7 @@ import {
 } from '../models/Card.ts'
 import { serializeWithBigIntQuoted } from './utils.ts'
 
-// TODO: move once all handlers under invserify
-const cardRepository = new CardRepository(pool, (tx) => new LaneRepository(tx))
-
-const getCardsHandler = async (ctx: Oak.Context) => {
+const getCardsHandler = async (cardRepository: CardRepository, ctx: Oak.Context) => {
 
   const joinedResults = await cardRepository.getAllCardsInLanes()
 
@@ -46,7 +43,7 @@ export interface CreateCardRequest {
   laneId: number | string,
 }
 
-const createNewCardHandler = async (ctx: Oak.Context) => {
+const createNewCardHandler = async (cardRepository: CardRepository, ctx: Oak.Context) => {
   const { value } = ctx.request.body({ type: 'json' })
   const { title, description, laneId }: CreateCardRequest = await value
 
@@ -61,7 +58,7 @@ export interface MoveCardRequest {
   destinationLaneId: number | string,
 }
 
-const moveCardHandler = async (ctx: Oak.Context) => {
+const moveCardHandler = async (cardRepository: CardRepository, ctx: Oak.Context) => {
   const { value } = ctx.request.body({ type: 'json' })
   const { cardId, destinationLaneId }: MoveCardRequest = await value
 
@@ -69,7 +66,7 @@ const moveCardHandler = async (ctx: Oak.Context) => {
   ctx.response.body = updated
 }
 
-const deleteCardHandler = async (ctx: Oak.Context) => {
+const deleteCardHandler = async (cardRepository: CardRepository, ctx: Oak.Context) => {
   const { cardId } = Oak.helpers.getQuery(ctx, { mergeParams: true })
   const deletionResult = await cardRepository.deleteCard(cardId)
 
