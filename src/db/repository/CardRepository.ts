@@ -101,7 +101,7 @@ export class DbCardRepository implements CardRepository {
 
   private async queryWithClient<T>(cb: (client: Postgres.QueryClient) => Promise<T>): Promise<T> {
 
-    if (this.pool instanceof Postgres.PoolClient) {
+    if (this.pool instanceof Postgres.Pool) {
       return await this.queryWithPool(cb)
     }
     else {
