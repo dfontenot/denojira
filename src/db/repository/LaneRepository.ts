@@ -22,8 +22,15 @@ interface RawLaneRow {
 type PoolOrTx = Postgres.Pool | Postgres.Transaction
 type PoolClientOrTx = Postgres.PoolClient | Postgres.Transaction
 
+export interface LaneRepository {
+  doesLaneExist(laneId: number | string): Promise<boolean>
+  isLaneDisabled(laneId: number | string): Promise<boolean>
+  createLane(name: string, isEnabled: boolean): Promise<Lane>
+  getAllLanes(): Promise<Lane[]>
+}
+
 @injectable()
-export class LaneRepository {
+export class DbLaneRepository implements LaneRepository {
   private qb
 
   constructor(@inject(DbConnectionPoolId) private pool: PoolOrTx) {

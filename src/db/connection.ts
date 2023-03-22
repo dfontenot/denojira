@@ -1,4 +1,4 @@
-import { Postgres } from '../src/deps-backend.ts'
+import { Postgres } from '../deps-backend.ts'
 
 const dbConnectionSettings = {
   hostname: 'localhost',

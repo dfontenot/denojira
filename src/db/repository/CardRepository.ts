@@ -43,8 +43,15 @@ export interface CardInLane {
   laneName: string,
 }
 
+export interface CardRepository {
+  moveCard(cardId: number | string, laneId: number | string): Promise<Card>
+  getAllCardsInLanes(): Promise<CardInLane[]>
+  createCard(title: string, description: string, laneId: number | string): Promise<Card>
+  deleteCard(cardId: number | string): Promise<boolean>
+}
+
 @injectable()
-export class CardRepository {
+export class DbCardRepository implements CardRepository {
   private qb
 
   constructor(
