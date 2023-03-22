@@ -1,6 +1,4 @@
 import {
-  autoprefixer,
-  DenoEmit,
   ESBuild,
   ESBuildDenoLoader,
   Mustache,
@@ -38,15 +36,15 @@ router.get('/', async (ctx) => {
   ctx.response.body = content
 })
 
-router.get('/old/static/app.js', async (ctx) => {
-  // NOTE: choosing to manually bundle each time in dev for reloadability TODO: caching settings
-  // TODO: bundle is really slow, ~2 seconds locally, will probably need a new solution
-  const appUrl = Path.toFileUrl(Path.resolve('./src/frontend/App.tsx'))
-  const { code } = await DenoEmit.bundle(appUrl)
-
-  ctx.response.headers.set('Content-Type', 'text/javascript')
-  ctx.response.body = code
-})
+// router.get('/old/static/app.js', async (ctx) => {
+//   // NOTE: choosing to manually bundle each time in dev for reloadability TODO: caching settings
+//   // TODO: bundle is really slow, ~2 seconds locally, will probably need a new solution
+//   const appUrl = Path.toFileUrl(Path.resolve('./src/frontend/App.tsx'))
+//   const { code } = await DenoEmit.bundle(appUrl)
+//
+//   ctx.response.headers.set('Content-Type', 'text/javascript')
+//   ctx.response.body = code
+// })
 
 router.get('/static/index.css', async (ctx) => {
 

@@ -8,7 +8,7 @@ import { LaneRepository } from './LaneRepository.ts'
 import { Card } from '../../models/Card.ts'
 import {
   DbConnectionPoolId,
-  LaneRepositoryFactory,
+  LaneRepositoryFactoryId,
 } from '../../types.ts'
 const {
   inject,
@@ -17,8 +17,9 @@ const {
 
 interface RawCardRow {
   id: number,
-  name: string,
-  is_enabled: boolean,
+  title: string,
+  description: string,
+  lane_id: number,
   created_at: Date,
   updated_at: Date,
 }
@@ -56,16 +57,17 @@ export class DbCardRepository implements CardRepository {
 
   constructor(
     @inject(DbConnectionPoolId) private pool: Postgres.Pool | Postgres.Client,
-    @inject(LaneRepositoryFactory) private laneRepositoryFactory: (client: Postgres.Transaction) => LaneRepository,
+    @inject(LaneRepositoryFactoryId) private laneRepositoryFactory: (client: Postgres.Transaction) => LaneRepository,
   ) {
     this.qb = Dex({ client: 'postgres' })
   }
 
   private cardMapper(row: RawCardRow): Card {
     return {
-      laneId: row['id'],
-      name: row['name'],
-      enabled: row['is_enabled'],
+      id: row['id'],
+      title: row['title'],
+      description: row['description'],
+      laneId: row['lane_id'],
       createdAt: row['created_at'],
       updatedAt: row['updated_at'],
     }
