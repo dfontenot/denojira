@@ -26,7 +26,7 @@ const {
   Container,
 } = Inversify
 
-type OakHandler = (ctx: Oak.Context) => Promise<void>
+export type OakHandler = (ctx: Oak.Context) => Promise<void>
 
 export const makeContainer = () => {
   const container = new Container()
@@ -48,7 +48,7 @@ export const makeContainer = () => {
   container.bind<OakHandler>(DISymbols.GetLanesHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
     (ctx: Oak.Context) => getLanesHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
   container.bind<OakHandler>(DISymbols.CreateLaneHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
-    (ctx: Oak.Context) => createNewCardHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+    (ctx: Oak.Context) => createNewLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
 
   return container
 }

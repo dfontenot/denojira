@@ -13,21 +13,21 @@ import {
 } from './src/deps-frontend.ts'
 import { App } from './src/frontend/App.tsx'
 import {
-  createNewCardHandler,
-  createNewLaneHandler,
-  deleteCardHandler,
-  getCardsHandler,
-  getLanesHandler,
-  moveCardHandler,
-} from './src/handlers/index.ts'
+  makeContainer,
+  type OakHandler,
+} from './src/container.ts'
+import * as DISymbols from './src/types.ts'
 const {
   Application,
   Router,
-  send } = Oak
+  send
+} = Oak
 const { renderToString } = ReactDOMServer
 
-const app = new Application()
+const container = makeContainer()
 
+// TODO: move into inversify container
+const app = new Application()
 const router = new Router()
 
 router.get('/', async (ctx) => {
@@ -81,13 +81,13 @@ router.get('/static/app.js', async (ctx) => {
   ctx.response.body = built.outputFiles[0].contents
 })
 
-router.get('/api/lanes', getLanesHandler)
-router.post('/api/lane', createNewLaneHandler)
+router.get('/api/lanes', container.get<OakHandler>(DISymbols.GetLanesHandlerId))
+router.post('/api/lane', container.get<OakHandler>(DISymbols.CreateLaneHandlerId))
 
-router.get('/api/cards', getCardsHandler)
-router.post('/api/card', createNewCardHandler)
-router.put('/api/card/lane', moveCardHandler)
-router.delete('/api/card/:cardId', deleteCardHandler)
+router.get('/api/cards', container.get<OakHandler>(DISymbols.GetCardsHandlerId))
+router.post('/api/card', container.get<OakHandler>(DISymbols.CreateNewCardHandlerId))
+router.put('/api/card/lane', container.get<OakHandler>(DISymbols.MoveCardHandlerId))
+router.delete('/api/card/:cardId', container.get<OakHandler>(DISymbols.DeleteCardHandlerId))
 
 // Logger
 app.use(async (ctx, next) => {
