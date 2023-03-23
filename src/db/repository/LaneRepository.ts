@@ -14,7 +14,7 @@ const {
 interface RawLaneRow {
   id: number,
   name: string,
-  is_enabled: boolean,
+  enabled: boolean,
   created_at: Date,
   updated_at: Date,
 }
@@ -41,7 +41,7 @@ export class DbLaneRepository implements LaneRepository {
     return {
       laneId: row['id'],
       name: row['name'],
-      enabled: row['is_enabled'],
+      enabled: row['enabled'],
       createdAt: row['created_at'],
       updatedAt: row['updated_at'],
     }
@@ -67,14 +67,21 @@ export class DbLaneRepository implements LaneRepository {
       return await this.queryWithPool(cb)
     }
     else {
-      return await cb(this.pool as Postgres.Transaction)
+      const tx = this.pool as Postgres.Transaction
+      try {
+        return await cb(tx)
+      }
+      catch (e) {
+        console.log(`failed to run query inside transaction ${tx.name}`, e)
+        throw e
+      }
     }
   }
 
   async doesLaneExist(laneId: number | string): Promise<boolean> {
     return await this.queryWithClient(async (client) => {
 
-      const query = this.qb('lanes').select('1').where('id', `${laneId}`).groupBy('id')
+      const query = this.qb('lanes').select(1).where('id', `${laneId}`).groupBy('id')
       console.log('lane exists query', query.toString())
 
       return (await client.queryObject(query.toString())).rows.length > 1
@@ -84,7 +91,8 @@ export class DbLaneRepository implements LaneRepository {
   async isLaneDisabled(laneId: number | string): Promise<boolean> {
     return await this.queryWithClient(async (client) => {
 
-      const query = this.qb('lanes').select('1').where({'id': `${laneId}`, 'is_enabled': false }).groupBy('id')
+      console.log('tx is', client)
+      const query = this.qb('lanes').select(1).where({'id': `${laneId}`, 'enabled': false }).groupBy('id')
       console.log('lane is disabled query', query.toString())
 
       return (await client.queryObject(query.toString())).rows.length > 1
@@ -94,18 +102,18 @@ export class DbLaneRepository implements LaneRepository {
   async createLane(name: string, isEnabled = true): Promise<Lane> {
     return await this.queryWithClient(async (client) => {
 
-      const insertQuery = this.qb('lanes').insert([{ name, is_enabled: isEnabled }], ['id'])
-      const result = await client.queryObject(insertQuery.toString())
+      const insertQuery = this.qb('lanes').insert([{ name, enabled: isEnabled }], ['id'])
+      const result = await client.queryObject<RawLaneRow>(insertQuery.toString())
       console.log('created lane', result)
 
-      return this.laneMapper(result.rows[0] as RawLaneRow)
+      return this.laneMapper(result.rows[0])
     })
   }
 
   async getAllLanes(): Promise<Lane[]> {
     return await this.queryWithClient(async (client) => {
-      const result = await client.queryObject(this.qb('lanes').select('*').toString())
-      return result.rows.map((row: unknown) => this.laneMapper(row as RawLaneRow))
+      const result = await client.queryObject<RawLaneRow>(this.qb('lanes').select('*').toString())
+      return result.rows.map((row: RawLaneRow) => this.laneMapper(row))
     })
   }
 }

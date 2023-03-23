@@ -112,21 +112,22 @@ export class DbCardRepository implements CardRepository {
   async moveCard(cardId: number | string, laneId: number | string): Promise<Card> {
     return await this.queryWithClient(async (client: Postgres.QueryClient) => {
 
-      const tx = client.createTransaction(`move_card_${cardId}_to_${laneId}`, { isolation_level: 'repeatable_read' })
+      const tx = client.createTransaction(`move_card_${cardId}_to_${laneId}`, { isolation_level: 'serializable' })
+      await tx.begin()
+
       const laneRepository = this.laneRepositoryFactory(tx)
 
-      await tx.begin()
       if (await laneRepository.isLaneDisabled(laneId)) {
         tx.rollback()
         throw Error('could not move card into disabled lane')
       }
 
       const query = this.qb('cards').update('lane_id', parseInt(`${laneId}`, 10), ['*'])
-      const results = await tx.queryObject(query.toString())
+      const results = await tx.queryObject<RawCardRow>(query.toString())
 
       tx.commit()
 
-      return this.cardMapper(results.rows[0] as RawCardRow)
+      return this.cardMapper(results.rows[0])
     })
   }
 
@@ -142,9 +143,9 @@ export class DbCardRepository implements CardRepository {
         'name as lane_name'
       ).innerJoin('lanes', 'cards.lane_id', 'lanes.id')
 
-      const results = await client.queryObject(query.toString())
+      const results = await client.queryObject<RawCardInLane>(query.toString())
 
-      return results.rows.map((row) => this.cardInLaneMapper(row as RawCardInLane))
+      return results.rows.map((row: RawCardInLane) => this.cardInLaneMapper(row))
     })
   }
 
@@ -152,9 +153,9 @@ export class DbCardRepository implements CardRepository {
     return await this.queryWithClient(async (client: Postgres.QueryClient) => {
 
       const query = this.qb('cards').insert({ title, description, lane_id: laneId }, ['id', 'title', 'description', 'created_at', 'updated_at'])
-      const results = await client.queryObject(query.toString())
+      const results = await client.queryObject<RawCardRow>(query.toString())
 
-      return this.cardMapper(results.rows[0] as RawCardRow)
+      return this.cardMapper(results.rows[0])
     })
   }
 
