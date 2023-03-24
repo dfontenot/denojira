@@ -14,6 +14,10 @@ import {
   CardRepository
 } from './db/repository/CardRepository.ts'
 import {
+  type DbClient,
+  PoolOrTxClient,
+} from './db/DbClient.ts'
+import {
   createNewCardHandler,
   createNewLaneHandler,
   deleteCardHandler,
@@ -32,10 +36,14 @@ export const makeContainer = () => {
   const container = new Container()
 
   container.bind<Postgres.Pool>(DISymbols.DbConnectionPoolId).toConstantValue(pool)
+  container.bind<DbClient>(DISymbols.DbClientId).to(PoolOrTxClient)
+  container.bind<Inversify.interfaces.Factory<DbClient>>(DISymbols.DbClientFromTxFactoryId)
+    .toFactory<DbClient, [Postgres.Transaction]>((_context: Inversify.interfaces.Context) =>
+      (tx: Postgres.Transaction) => new PoolOrTxClient(tx))
   container.bind<LaneRepository>(DISymbols.LaneRepositoryId).to(DbLaneRepository)
   container.bind<Inversify.interfaces.Factory<LaneRepository>>(DISymbols.LaneRepositoryFactoryId)
-    .toFactory<LaneRepository, [Postgres.Transaction]>((_context: Inversify.interfaces.Context) =>
-      (tx: Postgres.Transaction) => new DbLaneRepository(tx))
+    .toFactory<LaneRepository, [Postgres.Transaction]>((context: Inversify.interfaces.Context) =>
+      (tx: Postgres.Transaction) => new DbLaneRepository(context.container.get<(tx: Postgres.Transaction) => DbClient>(DISymbols.DbClientFromTxFactoryId)(tx)))
   container.bind<CardRepository>(DISymbols.CardRepositoryId).to(DbCardRepository)
   container.bind<OakHandler>(DISymbols.GetCardsHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
     (ctx: Oak.Context) => getCardsHandler(context.container.get(DISymbols.CardRepositoryId), ctx))

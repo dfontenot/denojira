@@ -5,7 +5,8 @@ import {
   Reflect,
 } from '../../deps-backend.ts'
 import { Lane } from '../../models/Lane.ts'
-import { DbConnectionPoolId } from '../../types.ts'
+import { type DbClient } from '../DbClient.ts'
+import { DbClientId } from '../../types.ts'
 const {
   inject,
   injectable,
@@ -19,9 +20,6 @@ interface RawLaneRow {
   updated_at: Date,
 }
 
-type PoolOrTx = Postgres.Pool | Postgres.Transaction
-type PoolClientOrTx = Postgres.PoolClient | Postgres.Transaction
-
 export interface LaneRepository {
   doesLaneExist(laneId: number | string): Promise<boolean>
   isLaneDisabled(laneId: number | string): Promise<boolean>
@@ -33,7 +31,7 @@ export interface LaneRepository {
 export class DbLaneRepository implements LaneRepository {
   private qb
 
-  constructor(@inject(DbConnectionPoolId) private pool: PoolOrTx) {
+  constructor(@inject(DbClientId) private client: DbClient) {
     this.qb = Dex({ client: 'postgres' })
   }
 
@@ -47,39 +45,8 @@ export class DbLaneRepository implements LaneRepository {
     }
   }
 
-  private async queryWithPool<T>(cb: (client: Postgres.PoolClient) => Promise<T>): Promise<T> {
-
-    let client: Postgres.PoolClient | null = null
-    const pool = this.pool as Postgres.Pool
-
-    try {
-      client = await pool.connect()
-      return await cb(client)
-    }
-    finally {
-      client?.release()
-    }
-  }
-
-  private async queryWithClient<T>(cb: (client: PoolClientOrTx) => Promise<T>): Promise<T> {
-
-    if (this.pool instanceof Postgres.Pool) {
-      return await this.queryWithPool(cb)
-    }
-    else {
-      const tx = this.pool as Postgres.Transaction
-      try {
-        return await cb(tx)
-      }
-      catch (e) {
-        console.log(`failed to run query inside transaction ${tx.name}`, e)
-        throw e
-      }
-    }
-  }
-
   async doesLaneExist(laneId: number | string): Promise<boolean> {
-    return await this.queryWithClient(async (client) => {
+    return await this.client.queryWithClient(async (client) => {
 
       const query = this.qb('lanes').select(1).where('id', `${laneId}`).groupBy('id')
       console.log('lane exists query', query.toString())
@@ -89,7 +56,7 @@ export class DbLaneRepository implements LaneRepository {
   }
 
   async isLaneDisabled(laneId: number | string): Promise<boolean> {
-    return await this.queryWithClient(async (client) => {
+    return await this.client.queryWithClient(async (client) => {
 
       console.log('tx is', client)
       const query = this.qb('lanes').select(1).where({'id': `${laneId}`, 'enabled': false }).groupBy('id')
@@ -100,7 +67,7 @@ export class DbLaneRepository implements LaneRepository {
   }
 
   async createLane(name: string, isEnabled = true): Promise<Lane> {
-    return await this.queryWithClient(async (client) => {
+    return await this.client.queryWithClient(async (client) => {
 
       const insertQuery = this.qb('lanes').insert([{ name, enabled: isEnabled }], ['id'])
       const result = await client.queryObject<RawLaneRow>(insertQuery.toString())
@@ -111,7 +78,7 @@ export class DbLaneRepository implements LaneRepository {
   }
 
   async getAllLanes(): Promise<Lane[]> {
-    return await this.queryWithClient(async (client) => {
+    return await this.client.queryWithClient(async (client) => {
       const result = await client.queryObject<RawLaneRow>(this.qb('lanes').select('*').toString())
       return result.rows.map((row: RawLaneRow) => this.laneMapper(row))
     })

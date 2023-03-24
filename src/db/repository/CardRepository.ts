@@ -4,10 +4,11 @@ import {
   Postgres,
   Reflect,
 } from '../../deps-backend.ts'
+import { type DbClient } from '../DbClient.ts'
 import { LaneRepository } from './LaneRepository.ts'
 import { Card } from '../../models/Card.ts'
 import {
-  DbConnectionPoolId,
+  DbClientId,
   LaneRepositoryFactoryId,
 } from '../../types.ts'
 const {
@@ -56,7 +57,7 @@ export class DbCardRepository implements CardRepository {
   private qb
 
   constructor(
-    @inject(DbConnectionPoolId) private pool: Postgres.Pool | Postgres.Client,
+    @inject(DbClientId) private client: DbClient,
     @inject(LaneRepositoryFactoryId) private laneRepositoryFactory: (client: Postgres.Transaction) => LaneRepository,
   ) {
     this.qb = Dex({ client: 'postgres' })
@@ -85,34 +86,8 @@ export class DbCardRepository implements CardRepository {
     }
   }
 
-  private async queryWithPool<T>(cb: (client: Postgres.PoolClient) => Promise<T>): Promise<T> {
-
-    let client: Postgres.PoolClient | null = null
-    const pool = this.pool as Postgres.Pool
-
-    try {
-      client = await pool.connect()
-      return await cb(client)
-    }
-    finally {
-      client?.release()
-    }
-  }
-
-  private async queryWithClient<T>(cb: (client: Postgres.QueryClient) => Promise<T>): Promise<T> {
-
-    if (this.pool instanceof Postgres.Pool) {
-      return await this.queryWithPool(cb)
-    }
-    else {
-      return await cb(this.pool as Postgres.Client)
-    }
-  }
-
   async moveCard(cardId: number | string, laneId: number | string): Promise<Card> {
-    return await this.queryWithClient(async (client: Postgres.QueryClient) => {
-
-      const tx = client.createTransaction(`move_card_${cardId}_to_${laneId}`, { isolation_level: 'serializable' })
+    return await this.client.withTransaction(`move_card_${cardId}_to_${laneId}`, { isolation_level: 'serializable' }, async (tx) => {
       await tx.begin()
 
       const laneRepository = this.laneRepositoryFactory(tx)
@@ -122,7 +97,8 @@ export class DbCardRepository implements CardRepository {
         throw Error('could not move card into disabled lane')
       }
 
-      const query = this.qb('cards').update('lane_id', parseInt(`${laneId}`, 10), ['*'])
+      const query = this.qb('cards').update('lane_id', parseInt(`${laneId}`, 10), ['*']).where('card_id', cardId)
+      console.log('update card query', query.toString())
       const results = await tx.queryObject<RawCardRow>(query.toString())
 
       tx.commit()
@@ -132,7 +108,7 @@ export class DbCardRepository implements CardRepository {
   }
 
   async getAllCardsInLanes(): Promise<CardInLane[]> {
-    return await this.queryWithClient(async (client: Postgres.QueryClient) => {
+    return await this.client.queryWithClient(async (client) => {
 
       const query = this.qb('cards').select('cards.id as card_id',
         'title',
@@ -150,7 +126,7 @@ export class DbCardRepository implements CardRepository {
   }
 
   async createCard(title: string, description: string, laneId: number | string): Promise<Card> {
-    return await this.queryWithClient(async (client: Postgres.QueryClient) => {
+    return await this.client.queryWithClient(async (client) => {
 
       const query = this.qb('cards').insert({ title, description, lane_id: laneId }, ['id', 'title', 'description', 'created_at', 'updated_at'])
       const results = await client.queryObject<RawCardRow>(query.toString())
@@ -160,7 +136,7 @@ export class DbCardRepository implements CardRepository {
   }
 
   async deleteCard(cardId: number | string): Promise<boolean> {
-    return await this.queryWithClient(async (client: Postgres.QueryClient) => {
+    return await this.client.queryWithClient(async (client) => {
 
       const query = this.qb('cards').where('id', cardId).delete()
       const results = await client.queryObject(query.toString())
