@@ -97,7 +97,7 @@ export class DbCardRepository implements CardRepository {
         throw Error('could not move card into disabled lane')
       }
 
-      const query = this.qb('cards').update('lane_id', parseInt(`${laneId}`, 10), ['*']).where('card_id', cardId)
+      const query = this.qb('cards').update('lane_id', parseInt(`${laneId}`, 10), ['*']).where('id', cardId)
       console.log('update card query', query.toString())
       const results = await tx.queryObject<RawCardRow>(query.toString())
 
