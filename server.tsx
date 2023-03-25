@@ -1,6 +1,7 @@
 import {
   ESBuild,
   ESBuildDenoLoader,
+  Logger,
   Mustache,
   Oak,
 } from './src/backend/deps.ts'
@@ -17,11 +18,13 @@ import * as DISymbols from './src/backend/types.ts'
 const {
   Application,
   Router,
-  send
+  send,
 } = Oak
 const { renderToString } = ReactDOMServer
 
 const container = makeContainer()
+
+Logger.setup(container.get<Logger.LogConfig>(DISymbols.LoggerConfigId))
 
 // TODO: move into inversify container
 const app = new Application()

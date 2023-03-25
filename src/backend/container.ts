@@ -1,10 +1,14 @@
 import {
   Fs,
   Inversify,
+  Logger,
   Oak,
   Postgres,
 } from './deps.ts'
-import { getDirectoryName } from './meta.ts'
+import {
+  getDirectoryName,
+  getModuleName,
+} from './meta.ts'
 import { pool } from './db/connection.ts'
 import * as DISymbols from './types.ts'
 import {
@@ -37,14 +41,50 @@ const {
 
 export type OakHandler = (ctx: Oak.Context) => Promise<void>
 
-const collectLoggerModules = () => {
-  console.log(getDirectoryName(import.meta.url))
-}
+// const collectLoggerModules = async (): Promise<string[]> => {
+//   const backendDirectoryBasename = getDirectoryName(import.meta.url)
+//
+//   const ignoreDirs = new Set([
+//     'models',
+//   ])
+//
+//   // NOTE: only supports uniqueness on filename, not path and filename
+//   const ignoreFiles = new Set([
+//     'connection.ts',
+//     'container.ts',
+//     'deps.ts',
+//     'index.ts',
+//     'meta.ts',
+//     'schema.ts',
+//     'types.ts',
+//   ])
+//
+//   const results = [] // TODO: array map this
+//   for await (const entry of walk(backendDirectoryBasename)) {
+//     if (!entry.isFile || ignoreFiles.has(entry.name)) {
+//       continue
+//     }
+//
+//     results.push(getModuleName(entry.path))
+//   }
+//
+//   return results
+// }
 
 export const makeContainer = () => {
   const container = new Container()
-  collectLoggerModules()
 
+  container.bind<Logger.LogConfig>(DISymbols.LoggerConfigId).toConstantValue({
+    handlers: {
+      console: new Logger.handlers.ConsoleHandler('DEBUG'),
+    },
+    loggers: {
+      default: {
+        level: 'DEBUG',
+        handlers: ['console',],
+      },
+    },
+  })
   container.bind<Postgres.Pool>(DISymbols.DbConnectionPoolId).toConstantValue(pool)
   container.bind<DbClient>(DISymbols.DbClientId).to(PoolOrTxClient)
   container.bind<Inversify.interfaces.Factory<DbClient>>(DISymbols.DbClientFromTxFactoryId)
