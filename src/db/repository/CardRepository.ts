@@ -1,9 +1,11 @@
 import {
   Dex,
   Inversify,
+  Logger,
   Postgres,
   Reflect,
 } from '../../deps-backend.ts'
+import { getModuleName } from '../../meta.ts'
 import { type DbClient } from '../DbClient.ts'
 import { LaneRepository } from './LaneRepository.ts'
 import { Card } from '../../models/Card.ts'
@@ -15,6 +17,7 @@ const {
   inject,
   injectable,
 } = Inversify
+const { getLogger } = Logger
 
 interface RawCardRow {
   id: number,
@@ -55,12 +58,14 @@ export interface CardRepository {
 @injectable()
 export class DbCardRepository implements CardRepository {
   private qb
+  private logger
 
   constructor(
     @inject(DbClientId) private client: DbClient,
     @inject(LaneRepositoryFactoryId) private laneRepositoryFactory: (client: Postgres.Transaction) => LaneRepository,
   ) {
     this.qb = Dex({ client: 'postgres' })
+    this.logger = getLogger(getModuleName(import.meta.url))
   }
 
   private cardMapper(row: RawCardRow): Card {
@@ -98,7 +103,7 @@ export class DbCardRepository implements CardRepository {
       }
 
       const query = this.qb('cards').update('lane_id', parseInt(`${laneId}`, 10), ['*']).where('id', cardId)
-      console.log('update card query', query.toString())
+      this.logger.debug('update card query', query.toString())
       const results = await tx.queryObject<RawCardRow>(query.toString())
 
       tx.commit()

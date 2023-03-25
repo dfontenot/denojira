@@ -1,8 +1,10 @@
 import {
+  Fs,
   Inversify,
   Oak,
   Postgres,
 } from './deps-backend.ts'
+import { getDirectoryName } from './meta.ts'
 import { pool } from './db/connection.ts'
 import * as DISymbols from './types.ts'
 import {
@@ -29,11 +31,19 @@ import {
 const {
   Container,
 } = Inversify
+const {
+  walk,
+} = Fs
 
 export type OakHandler = (ctx: Oak.Context) => Promise<void>
 
+const collectLoggerModules = () => {
+  console.log(getDirectoryName(import.meta.url))
+}
+
 export const makeContainer = () => {
   const container = new Container()
+  collectLoggerModules()
 
   container.bind<Postgres.Pool>(DISymbols.DbConnectionPoolId).toConstantValue(pool)
   container.bind<DbClient>(DISymbols.DbClientId).to(PoolOrTxClient)

@@ -1,22 +1,24 @@
 import {
+  Logger,
   Oak,
 } from '../deps-backend.ts'
 import {
   CardRepository,
   type CardInLane,
 } from '../db/repository/CardRepository.ts'
-import {
-  LaneRepository,
-} from '../db/repository/LaneRepository.ts'
-import { pool } from '../db/connection.ts'
+import { getModuleName } from '../meta.ts'
 import {
   CardResponse,
   GetCardsResponse
 } from '../models/Card.ts'
 import { serializeWithBigIntQuoted } from './utils.ts'
+const { getLogger } = Logger
+
+const logger = getLogger(getModuleName(import.meta.url))
 
 const getCardsHandler = async (cardRepository: CardRepository, ctx: Oak.Context) => {
 
+  logger.debug('loading all cards')
   const joinedResults = await cardRepository.getAllCardsInLanes()
 
   // TODO: clean up typing errors

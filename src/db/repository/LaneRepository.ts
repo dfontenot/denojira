@@ -1,9 +1,10 @@
 import {
   Dex,
   Inversify,
-  Postgres,
+  Logger,
   Reflect,
 } from '../../deps-backend.ts'
+import { getModuleName } from '../../meta.ts'
 import { Lane } from '../../models/Lane.ts'
 import { type DbClient } from '../DbClient.ts'
 import { DbClientId } from '../../types.ts'
@@ -11,6 +12,7 @@ const {
   inject,
   injectable,
 } = Inversify
+const { getLogger } = Logger
 
 interface RawLaneRow {
   id: number,
@@ -30,9 +32,11 @@ export interface LaneRepository {
 @injectable()
 export class DbLaneRepository implements LaneRepository {
   private qb
+  private logger
 
   constructor(@inject(DbClientId) private client: DbClient) {
     this.qb = Dex({ client: 'postgres' })
+    this.logger = getLogger(getModuleName(import.meta.url))
   }
 
   private laneMapper(row: RawLaneRow): Lane {
@@ -49,7 +53,7 @@ export class DbLaneRepository implements LaneRepository {
     return await this.client.queryWithClient(async (client) => {
 
       const query = this.qb('lanes').select(1).where('id', `${laneId}`).groupBy('id')
-      console.log('lane exists query', query.toString())
+      this.logger.debug('lane exists query', query.toString())
 
       return (await client.queryObject(query.toString())).rows.length > 1
     })
@@ -58,9 +62,9 @@ export class DbLaneRepository implements LaneRepository {
   async isLaneDisabled(laneId: number | string): Promise<boolean> {
     return await this.client.queryWithClient(async (client) => {
 
-      console.log('tx is', client)
+      this.logger.debug('tx is', client)
       const query = this.qb('lanes').select(1).where({'id': `${laneId}`, 'enabled': false }).groupBy('id')
-      console.log('lane is disabled query', query.toString())
+      this.logger.debug('lane is disabled query', query.toString())
 
       return (await client.queryObject(query.toString())).rows.length > 1
     })
@@ -71,7 +75,7 @@ export class DbLaneRepository implements LaneRepository {
 
       const insertQuery = this.qb('lanes').insert([{ name, enabled: isEnabled }], ['id'])
       const result = await client.queryObject<RawLaneRow>(insertQuery.toString())
-      console.log('created lane', result)
+      this.logger.debug('created lane', result)
 
       return this.laneMapper(result.rows[0])
     })
