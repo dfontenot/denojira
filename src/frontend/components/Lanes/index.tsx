@@ -1,7 +1,7 @@
 import {
   React,
   ReactRedux,
-} from '../../../deps.ts'
+} from '../../deps.ts'
 import {
   fetchLanesAction,
   LaneSliceState,
@@ -12,8 +12,8 @@ import {
 } from '../../redux/cardsSlice.ts'
 import { type FetchStatus } from '../../redux/slices.ts'
 import { StoreDispatch } from '../../redux/store.ts'
-import { type Lane as LaneModel } from '../../../models/Lane.ts'
-import { type GetCardsResponse } from '../../../models/Card.ts'
+import { type Lane as LaneModel } from '../../../backend/models/Lane.ts'
+import { type GetCardsResponse } from '../../../backend/models/Card.ts'
 import { Cards } from '../Cards/index.tsx'
 import { Lane } from '../Lane/index.tsx'
 

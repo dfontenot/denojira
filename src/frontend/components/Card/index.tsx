@@ -1,7 +1,7 @@
 import {
   React,
   ReactDnD,
-} from '../../../deps.ts'
+} from '../../deps.ts'
 import { cardSym } from '../../dnd/syms.ts'
 
 const { useDrag } = ReactDnD

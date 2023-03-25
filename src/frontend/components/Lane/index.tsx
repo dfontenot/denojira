@@ -2,13 +2,13 @@ import {
   React,
   ReactDnD,
   ReactRedux,
-} from '../../../deps.ts'
+} from '../../deps.ts'
 import { moveCardAction } from '../../redux/cardsSlice.ts'
 import { cardSym } from '../../dnd/syms.ts'
 import { Cards } from '../Cards/index.tsx'
 import { StoreDispatch } from '../../redux/store.ts'
-import { type Lane as LaneModel } from '../../../models/Lane.ts'
-import { type CardResponse } from '../../../models/Card.ts'
+import { type Lane as LaneModel } from '../../../backend/models/Lane.ts'
+import { type CardResponse } from '../../../backend/models/Card.ts'
 import { type CardItem } from '../../dnd/CardItem.ts'
 
 const { useDrop } = ReactDnD

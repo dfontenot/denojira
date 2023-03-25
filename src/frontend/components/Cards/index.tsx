@@ -1,7 +1,7 @@
 import {
   React,
-} from '../../../deps.ts'
-import { CardResponse } from '../../../models/Card.ts'
+} from '../../deps.ts'
+import { CardResponse } from '../../../backend/models/Card.ts'
 import { Card } from '../Card/index.tsx'
 
 interface Props {

@@ -1,11 +1,11 @@
 import {
   React,
   ReactRedux,
-} from '../../../deps.ts'
+} from '../../deps.ts'
 import { StoreDispatch } from '../../redux/store.ts'
 import { createCardAction } from '../../redux/cardsSlice.ts'
 import { LaneSliceState } from '../../redux/laneSlice.ts'
-import { Lane } from '../../../models/Lane.ts'
+import { Lane } from '../../../backend/models/Lane.ts'
 
 const {
   useRef,
