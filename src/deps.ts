@@ -1,2 +1,2 @@
-export * as Backend from './deps-backend.ts'
-export * as Frontend from './deps-frontend.ts'
+export * as Backend from './backend/deps.ts'
+export * as Frontend from './frontend/deps.ts'
