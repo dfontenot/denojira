@@ -3,7 +3,7 @@ import {
   Inversify,
   Oak,
   Postgres,
-} from './deps-backend.ts'
+} from './deps.ts'
 import { getDirectoryName } from './meta.ts'
 import { pool } from './db/connection.ts'
 import * as DISymbols from './types.ts'
