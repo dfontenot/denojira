@@ -1,6 +1,6 @@
 import {
   Oak,
-} from '../deps-backend.ts'
+} from '../deps.ts'
 import { serializeWithBigIntQuoted } from './utils.ts'
 import { LaneRepository } from '../db/repository/LaneRepository.ts'
 

@@ -1,6 +1,6 @@
 import {
   ReduxToolkit,
-} from '../../deps-frontend.ts'
+} from '../../deps.ts'
 import { Lane } from '../../models/Lane.ts'
 import { type FetchStatus } from './slices.ts'
 

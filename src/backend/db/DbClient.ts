@@ -1,7 +1,7 @@
 import {
   Inversify,
   Postgres,
-} from '../deps-backend.ts'
+} from '../deps.ts'
 import { DbConnectionPoolId } from '../types.ts'
 const {
   inject,

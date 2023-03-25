@@ -2,7 +2,7 @@ import {
   React,
   ReactDnD,
   ReactRedux,
-} from '../../../deps-frontend.ts'
+} from '../../../deps.ts'
 import { moveCardAction } from '../../redux/cardsSlice.ts'
 import { cardSym } from '../../dnd/syms.ts'
 import { Cards } from '../Cards/index.tsx'

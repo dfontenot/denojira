@@ -3,7 +3,7 @@ import {
   ReactDnD,
   ReactDnDHTML5,
   ReactRedux,
-} from '../deps-frontend.ts'
+} from '../deps.ts'
 const { DndProvider } = ReactDnD
 const { HTML5Backend } = ReactDnDHTML5
 

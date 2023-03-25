@@ -1,7 +1,7 @@
 import {
   React,
   ReactRedux,
-} from '../../../deps-frontend.ts'
+} from '../../../deps.ts'
 import {
   fetchLanesAction,
   LaneSliceState,

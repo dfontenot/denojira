@@ -1,4 +1,4 @@
-import { Dex } from '../deps-backend.ts'
+import { Dex } from '../deps.ts'
 
 const dex = Dex({ client: 'postgres' })
 

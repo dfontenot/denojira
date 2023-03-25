@@ -1,7 +1,7 @@
 import {
   React,
   ReactDOM,
-} from '../deps-frontend.ts'
+} from '../deps.ts'
 
 import { App } from './App.tsx'
 

@@ -1,6 +1,6 @@
 import {
   ReduxToolkit,
-} from '../../deps-frontend.ts'
+} from '../../deps.ts'
 import { type GetCardsResponse } from '../../models/Card.ts'
 import {
   type CreateCardRequest,

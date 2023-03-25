@@ -1,7 +1,7 @@
 import {
   React,
   ReactRedux,
-} from '../../../deps-frontend.ts'
+} from '../../../deps.ts'
 import { StoreDispatch } from '../../redux/store.ts'
 import { createCardAction } from '../../redux/cardsSlice.ts'
 import { LaneSliceState } from '../../redux/laneSlice.ts'

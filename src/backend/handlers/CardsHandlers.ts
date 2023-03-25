@@ -1,7 +1,7 @@
 import {
   Logger,
   Oak,
-} from '../deps-backend.ts'
+} from '../deps.ts'
 import {
   CardRepository,
   type CardInLane,

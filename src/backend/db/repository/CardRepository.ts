@@ -4,7 +4,7 @@ import {
   Logger,
   Postgres,
   Reflect,
-} from '../../deps-backend.ts'
+} from '../../deps.ts'
 import { getModuleName } from '../../meta.ts'
 import { type DbClient } from '../DbClient.ts'
 import { LaneRepository } from './LaneRepository.ts'

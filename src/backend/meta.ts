@@ -1,6 +1,6 @@
 import {
   Path,
-} from './deps-backend.ts'
+} from './deps.ts'
 const {
   basename,
   SEP,
