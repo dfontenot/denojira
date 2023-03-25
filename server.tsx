@@ -3,18 +3,17 @@ import {
   ESBuildDenoLoader,
   Mustache,
   Oak,
-  Path,
-} from './src/deps-backend.ts'
+} from './src/backend/deps.ts'
 import {
   React,
   ReactDOMServer,
-} from './src/deps-frontend.ts'
+} from './src/frontend/deps.ts'
 import { App } from './src/frontend/App.tsx'
 import {
   makeContainer,
   type OakHandler,
-} from './src/container.ts'
-import * as DISymbols from './src/types.ts'
+} from './src/backend/container.ts'
+import * as DISymbols from './src/backend/types.ts'
 const {
   Application,
   Router,

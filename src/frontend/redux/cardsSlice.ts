@@ -1,11 +1,11 @@
 import {
   ReduxToolkit,
-} from '../../deps.ts'
-import { type GetCardsResponse } from '../../models/Card.ts'
+} from '../deps.ts'
+import { type GetCardsResponse } from '../../backend/models/Card.ts'
 import {
   type CreateCardRequest,
   type MoveCardRequest,
-} from '../../handlers/CardsHandlers.ts'
+} from '../../backend/handlers/CardsHandlers.ts'
 import { type FetchStatus } from './slices.ts'
 
 const {

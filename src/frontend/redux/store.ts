@@ -1,6 +1,6 @@
 import {
   ReduxToolkit,
-} from '../../deps.ts'
+} from '../deps.ts'
 import laneSlice from './laneSlice.ts'
 import cardsSlice, { fetchCardsAction } from './cardsSlice.ts'
 
