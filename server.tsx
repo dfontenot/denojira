@@ -24,7 +24,7 @@ const { renderToString } = ReactDOMServer
 
 const container = makeContainer()
 
-Logger.setup(container.get<Logger.LogConfig>(DISymbols.LoggerConfigId))
+Logger.setup(await container.getAsync<Logger.LogConfig>(DISymbols.LoggerConfigId))
 
 // TODO: move into inversify container
 const app = new Application()

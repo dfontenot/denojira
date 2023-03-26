@@ -14,10 +14,9 @@ import {
 import { serializeWithBigIntQuoted } from './utils.ts'
 const { getLogger } = Logger
 
-const logger = getLogger(getModuleName(import.meta.url))
-
 const getCardsHandler = async (cardRepository: CardRepository, ctx: Oak.Context) => {
 
+  const logger = getLogger(getModuleName(import.meta.url))
   logger.debug('loading all cards')
   const joinedResults = await cardRepository.getAllCardsInLanes()
 

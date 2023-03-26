@@ -5,7 +5,7 @@ import {
   Postgres,
   Reflect,
 } from '../../deps.ts'
-import { getModuleName } from '../../meta.ts'
+import { getModuleName, getDirectoryName } from '../../meta.ts'
 import { type DbClient } from '../DbClient.ts'
 import { LaneRepository } from './LaneRepository.ts'
 import { Card } from '../../models/Card.ts'
