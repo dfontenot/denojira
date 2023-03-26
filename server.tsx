@@ -48,7 +48,7 @@ router.get('/', async (ctx) => {
 //   ctx.response.body = code
 // })
 
-router.get('/static/index.css', async (ctx) => {
+router.get('/static/index.css', (ctx) => {
 
   ctx.response.status = Oak.Status.NotFound
   ctx.response.headers.set('Content-Type', 'text/css')
@@ -82,6 +82,8 @@ router.get('/static/app.js', async (ctx) => {
 })
 
 router.get('/api/lanes', container.get<OakHandler>(DISymbols.GetLanesHandlerId))
+router.put('/api/lane/:laneId/disable', container.get<OakHandler>(DISymbols.DisableLaneHandlerId))
+router.put('/api/lane/:laneId/enable', container.get<OakHandler>(DISymbols.EnableLaneHandlerId))
 router.post('/api/lane', container.get<OakHandler>(DISymbols.CreateLaneHandlerId))
 
 router.get('/api/cards', container.get<OakHandler>(DISymbols.GetCardsHandlerId))

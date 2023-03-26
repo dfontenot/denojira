@@ -27,6 +27,7 @@ export interface LaneRepository {
   isLaneDisabled(laneId: number | string): Promise<boolean>
   createLane(name: string, isEnabled: boolean): Promise<Lane>
   getAllLanes(): Promise<Lane[]>
+  setLaneEnableStatus(laneId: number | string, setTo: boolean): Promise<boolean>
 }
 
 @injectable()
@@ -85,6 +86,13 @@ export class DbLaneRepository implements LaneRepository {
     return await this.client.queryWithClient(async (client) => {
       const result = await client.queryObject<RawLaneRow>(this.qb('lanes').select('*').toString())
       return result.rows.map((row: RawLaneRow) => this.laneMapper(row))
+    })
+  }
+
+  async setLaneEnableStatus(laneId: number | string, setTo: boolean): Promise<boolean> {
+    return await this.client.queryWithClient(async (client) => {
+      const result = await client.queryObject(this.qb('lanes').where('id', `${laneId}`).update({ enabled: setTo }))
+      return (result.rowCount || 0) == 1
     })
   }
 }

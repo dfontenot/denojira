@@ -27,6 +27,8 @@ import {
   createNewCardHandler,
   createNewLaneHandler,
   deleteCardHandler,
+  disableLaneHandler,
+  enableLaneHandler,
   getCardsHandler,
   getLanesHandler,
   moveCardHandler,
@@ -40,6 +42,8 @@ const {
 } = Fs
 
 export type OakHandler = (ctx: Oak.Context) => Promise<void>
+
+const defaultLogLevel = 'DEBUG'
 
 const collectLoggerModules = async (): Promise<Record<string, Logger.LoggerConfig>> => {
   const backendDirectoryBasename = getDirectoryName(import.meta.url)
@@ -66,7 +70,7 @@ const collectLoggerModules = async (): Promise<Record<string, Logger.LoggerConfi
     }
 
     results[getModuleName(entry.path)] = {
-      level: 'DEBUG',
+      level: defaultLogLevel,
       handlers: ['console',],
     }
   }
@@ -83,7 +87,7 @@ export const makeContainer = () => {
     },
     loggers: {
       default: {
-        level: 'DEBUG',
+        level: defaultLogLevel,
         handlers: ['console',],
       },
       ...(await collectLoggerModules())
@@ -111,6 +115,10 @@ export const makeContainer = () => {
     (ctx: Oak.Context) => getLanesHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
   container.bind<OakHandler>(DISymbols.CreateLaneHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
     (ctx: Oak.Context) => createNewLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+  container.bind<OakHandler>(DISymbols.DisableLaneHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
+    (ctx: Oak.Context) => disableLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+  container.bind<OakHandler>(DISymbols.EnableLaneHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
+    (ctx: Oak.Context) => enableLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
 
   return container
 }

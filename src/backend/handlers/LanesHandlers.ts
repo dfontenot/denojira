@@ -19,7 +19,21 @@ const createNewLaneHandler = async (laneRepository: LaneRepository, ctx: Oak.Con
   ctx.response.body = serializeWithBigIntQuoted(created)
 }
 
+const changeLaneEnableStatus = async (setEnableStatusTo: boolean, laneRepository: LaneRepository, ctx: Oak.Context) => {
+  const { laneId } = Oak.helpers.getQuery(ctx, { mergeParams: true })
+  const didIntendedLaneUpdate = await laneRepository.setLaneEnableStatus(laneId, setEnableStatusTo)
+
+  if (! didIntendedLaneUpdate) {
+    ctx.response.status = Oak.Status.NotFound
+  }
+}
+
+const enableLaneHandler = async (laneRepository: LaneRepository, ctx: Oak.Context) => await changeLaneEnableStatus(true, laneRepository, ctx)
+const disableLaneHandler = async (laneRepository: LaneRepository, ctx: Oak.Context) => await changeLaneEnableStatus(false, laneRepository, ctx)
+
 export {
   createNewLaneHandler,
+  disableLaneHandler,
+  enableLaneHandler,
   getLanesHandler,
 }
