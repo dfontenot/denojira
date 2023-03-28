@@ -28,14 +28,14 @@ export const Card = ({ title, description, id, laneId }: Props) => {
 
   return (
     <article
-      className='center mw5 mw6-ns hidden ba mv4'
+      className='flex-auto'
       ref={drag}
       style={{
         opacity: isDragging ? 0.5 : 1,
       }}>
-    <h1 className='f4 bg-near-black white mv0 pv2 ph3'>{title}</h1>
-      <div className='pa3 bt'>
-        <p className='f6 f5-ns lh-copy measure mv0'>{description}</p>
+    <h1 className=''>{title}</h1>
+      <div className=''>
+        <p className=''>{description}</p>
       </div>
     </article>)
   // return <div

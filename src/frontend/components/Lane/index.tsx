@@ -33,8 +33,10 @@ export const Lane = ({ lane, cardData }: Props) => {
     },
   }))
 
-  return <div className='outline w-25 pa3 mr2' ref={ref}>
-    <p>{lane.name}</p>
+  return <div className='border-2 border-solid border-slate-600 rounded-lg p-2 flex-auto' ref={ref}>
+    <div className='mx-auto'>
+      <p className='font-semibold'>{lane.name}</p>
+    </div>
     <Cards laneId={lane.laneId} cardData={cardData} />
   </div>
 }

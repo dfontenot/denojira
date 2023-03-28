@@ -11,7 +11,7 @@ interface Props {
 
 export const Cards = ({ cardData, laneId }: Props) => {
 
-  return <div className='flex flex-column'>
+  return <div className='flex flex-col'>
     {cardData.map((card: CardResponse) => <Card key={card.id} id={card.id} laneId={laneId} title={card.title} description={card.description} />)}
     </div>
 }
