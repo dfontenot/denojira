@@ -28,22 +28,16 @@ export const Card = ({ title, description, id, laneId }: Props) => {
 
   return (
     <article
-      className='flex-auto'
+      className='grow-0 border-1 border-solid border-slate-600 rounded-lg'
       ref={drag}
       style={{
         opacity: isDragging ? 0.5 : 1,
       }}>
-    <h1 className=''>{title}</h1>
-      <div className=''>
-        <p className=''>{description}</p>
+      <div className='font-medium'>
+        <p>{title}</p>
+      </div>
+      <div className='font-light'>
+        <p>{description}</p>
       </div>
     </article>)
-  // return <div
-  //   className='card-item'
-  //   ref={drag}
-  //   style={{
-  //     opacity: isDragging ? 0.5 : 1,
-  //   }}>
-  //   <p><u>{title}</u><br/>{description}</p>
-  //   </div>
 }
