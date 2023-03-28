@@ -1,4 +1,5 @@
 import {
+  Asynciter,
   Fs,
   Inversify,
   Logger,
@@ -35,6 +36,9 @@ import {
 } from './handlers/index.ts'
 
 const {
+  asynciter,
+} = Asynciter
+const {
   Container,
 } = Inversify
 const {
@@ -48,34 +52,19 @@ const defaultLogLevel = 'DEBUG'
 const collectLoggerModules = async (): Promise<Record<string, Logger.LoggerConfig>> => {
   const backendDirectoryBasename = getDirectoryName(import.meta.url)
 
-  const ignoreDirs = new Set([
-    'models',
-  ])
+  const ignore = [
+    /connection.ts$/,
+    /container.ts$/,
+    /deps.ts$/,
+    /index.ts$/,
+    /meta.ts$/,
+    /models/,
+    /schema.ts$/,
+    /types.ts$/,
+  ]
 
-  // NOTE: only supports uniqueness on filename, not path and filename
-  const ignoreFiles = new Set([
-    'connection.ts',
-    'container.ts',
-    'deps.ts',
-    'index.ts',
-    'meta.ts',
-    'schema.ts',
-    'types.ts',
-  ])
-
-  const results: Record<string, Logger.LoggerConfig> = {} // TODO: array map this
-  for await (const entry of walk(backendDirectoryBasename)) {
-    if (!entry.isFile || ignoreFiles.has(entry.name)) {
-      continue
-    }
-
-    results[getModuleName(entry.path)] = {
-      level: defaultLogLevel,
-      handlers: ['console',],
-    }
-  }
-
-  return results
+  return await asynciter(walk(backendDirectoryBasename, { includeDirs: false, exts: ['ts'], skip: ignore }))
+    .reduce({}, (acc, entry) => ({...acc, [getModuleName(entry.path)]: { level: defaultLogLevel, handlers: ['console',], }}))
 }
 
 export const makeContainer = () => {
