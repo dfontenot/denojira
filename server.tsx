@@ -1,9 +1,14 @@
 import {
+  Asynciter,
   ESBuild,
   ESBuildDenoLoader,
+  Fs,
   Logger,
   Mustache,
   Oak,
+  Path,
+  WindiCSSLib,
+  WindiCSSParser,
 } from './src/backend/deps.ts'
 import {
   React,
@@ -14,13 +19,31 @@ import {
   makeContainer,
   type OakHandler,
 } from './src/backend/container.ts'
+import { getDirectoryName } from './src/backend/meta.ts'
 import * as DISymbols from './src/backend/types.ts'
 const {
   Application,
   Router,
   send,
 } = Oak
-const { renderToString } = ReactDOMServer
+const {
+  asynciter,
+} = Asynciter
+const {
+  Processor,
+} = WindiCSSLib
+const {
+  HTMLParser,
+} = WindiCSSParser
+const {
+  walk,
+} = Fs
+const {
+  join,
+} = Path
+const {
+  renderToString,
+} = ReactDOMServer
 
 const container = makeContainer()
 
@@ -48,15 +71,23 @@ router.get('/', async (ctx) => {
 //   ctx.response.body = code
 // })
 
-router.get('/static/index.css', (ctx) => {
-
-  ctx.response.status = Oak.Status.NotFound
-  ctx.response.headers.set('Content-Type', 'text/css')
-  ctx.response.body = 'TODO'
-})
-
 router.get('/static/app.css', async (ctx) => {
-  await send(ctx, './public/css/app.css')
+
+  // NOTE: assumes that all mentions of stylesheets in code occur in the index.tsx file in a component
+  const backendDirectoryBasename = join(getDirectoryName(import.meta.url), 'src', 'frontend', 'components')
+  const tsxText = await asynciter(walk(backendDirectoryBasename, { includeDirs: false, exts: ['.tsx'], match: [/index/]}))
+    .concurrentUnorderedMap(async (entry) => await Deno.readTextFile(entry.path))
+    .reduce('', (acc, item) => acc + item)
+
+  const processor = new Processor()
+  const htmlClasses = new HTMLParser(tsxText).parseClasses().map((i) => i.result).join(' ')
+  const preflight = processor.preflight(tsxText)
+
+  const interpreted = processor.interpret(htmlClasses).styleSheet
+  const styles = interpreted.extend(preflight, false).build(false)
+
+  ctx.response.headers.set('Content-Type', 'text/css')
+  ctx.response.body = styles
 })
 
 router.get('/static/app.js', async (ctx) => {
