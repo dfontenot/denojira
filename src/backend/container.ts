@@ -90,6 +90,10 @@ export const makeContainer = () => {
         level: defaultLogLevel,
         handlers: ['console',],
       },
+      server: { // the logger for anything in server.tsx
+        level: defaultLogLevel,
+        handlers: ['console',],
+      },
       ...(await collectLoggerModules())
     },
   }))

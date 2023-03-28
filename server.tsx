@@ -44,6 +44,9 @@ const {
 const {
   renderToString,
 } = ReactDOMServer
+const {
+  getLogger,
+} = Logger
 
 const container = makeContainer()
 
@@ -73,14 +76,17 @@ router.get('/', async (ctx) => {
 
 router.get('/static/app.css', async (ctx) => {
 
-  // NOTE: assumes that all mentions of stylesheets in code occur in the index.tsx file in a component
+  const logger = getLogger('server')
+
+  // NOTE: assumes that all mentions of stylesheets in code occur in App.tsx or a components
   const backendDirectoryBasename = join(getDirectoryName(import.meta.url), 'src', 'frontend', 'components')
-  const tsxText = await asynciter(walk(backendDirectoryBasename, { includeDirs: false, exts: ['.tsx'], match: [/index/]}))
-    .concurrentUnorderedMap(async (entry) => await Deno.readTextFile(entry.path))
+  const tsxText = await asynciter(walk(backendDirectoryBasename, { includeDirs: false, exts: ['.tsx'], match: [/index/, /App/]}))
+    .concurrentUnorderedMap(async (entry) => { logger.debug(`reading file for windicss ${entry.path}`); return await Deno.readTextFile(entry.path) })
     .reduce('', (acc, item) => acc + item)
 
   const processor = new Processor()
   const htmlClasses = new HTMLParser(tsxText).parseClasses().map((i) => i.result).join(' ')
+  logger.debug(`encountered CSS classes ${htmlClasses}`)
   const preflight = processor.preflight(tsxText)
 
   const interpreted = processor.interpret(htmlClasses).styleSheet
