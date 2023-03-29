@@ -83,7 +83,7 @@ router.get('/static/app.css', async (ctx) => {
 
   // NOTE: assumes that all mentions of stylesheets in code occur in App.tsx or a components
   const backendDirectoryBasename = join(getDirectoryName(import.meta.url), 'src', 'frontend')
-  const tsxText = await asynciter(walk(backendDirectoryBasename, { includeDirs: false, exts: ['.tsx'], match: [/components.*index/, /App/] }))
+  const tsxText = await asynciter(walk(backendDirectoryBasename, { includeDirs: false, exts: ['.tsx'], match: [/components/, /App/] }))
     .concurrentUnorderedMap(async (entry) => { logger.debug(`reading file for windicss ${entry.path}`); return await Deno.readTextFile(entry.path) })
     .reduce('', (acc, item) => acc + item)
 

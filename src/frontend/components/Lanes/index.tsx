@@ -10,11 +10,11 @@ import {
   fetchCardsAction,
   CardsSliceState,
 } from '../../redux/cardsSlice.ts'
+import { LoadingNotice } from './LoadingNotice.tsx'
 import { type FetchStatus } from '../../redux/slices.ts'
 import { StoreDispatch } from '../../redux/store.ts'
 import { type Lane as LaneModel } from '../../../backend/models/Lane.ts'
 import { type GetCardsResponse } from '../../../backend/models/Card.ts'
-import { Cards } from '../Cards/index.tsx'
 import { Lane } from '../Lane/index.tsx'
 
 const {
@@ -49,23 +49,8 @@ export const Lanes = () => {
 
   }, [lanesFetchStatus, cardsFetchStatus, dispatch])
 
-  // TODO: also show loading for the cards API
-  let content
-  if (lanesFetchStatus === 'idle') {
-    content = 'not loaded yet'
-  }
-  else if (lanesFetchStatus === 'loading') {
-    content = 'loading...'
-  }
-  else if (lanesFetchStatus === 'succeeded') {
-    content = 'data loaded'
-  }
-  else if (lanesFetchStatus === 'failed') {
-    content = `bad ${lanesFetchError}`
-  }
-
   return <>
-      <p>foo {content}</p>
+      <LoadingNotice fetchStatus={lanesFetchStatus} fetchError={lanesFetchError} />
       <div className='flex flex-row space-x-4'>
         {lanes.map((lane, idx) => {
           const cardsInLane = (cards[lane.laneId] || { cards: [] })['cards']
@@ -74,3 +59,5 @@ export const Lanes = () => {
       </div>
     </>
 }
+
+export { LoadingNotice }
