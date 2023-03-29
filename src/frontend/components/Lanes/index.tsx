@@ -33,7 +33,7 @@ export const Lanes = () => {
 
   const cardsFetchStatus = useSelector<CardsSliceState, FetchStatus>((state) => state.cards.loadingStatus)
   const cardsFetchError = useSelector<CardsSliceState, string | undefined>((state) => state.cards.error)
-  const cards = useSelector<CardsSliceState, GetCardsResponse>((state) => state.cards.groupedCards)
+  const cards = useSelector<CardsSliceState, GetCardsResponse | undefined>((state) => state.cards.groupedCards)
 
   // TODO: move up to app since card creation also depends on fetching this data
   useEffect(() => {
@@ -53,8 +53,8 @@ export const Lanes = () => {
       <LoadingNotice fetchStatus={lanesFetchStatus} fetchError={lanesFetchError} />
       <div className='flex flex-row space-x-4'>
         {lanes.map((lane, idx) => {
-          const cardsInLane = (cards[lane.laneId] || { cards: [] })['cards']
-          return <Lane key={idx} lane={lane} cardData={cardsInLane} />
+          const cardsInLane = ((cards ?? {})[lane.laneId] || { cards: [] })['cards']
+          return <Lane key={idx} lane={lane} cardData={cardsInLane} cardsFetchError={cardsFetchError} cardsFetchStatus={cardsFetchStatus} />
         })}
       </div>
     </>

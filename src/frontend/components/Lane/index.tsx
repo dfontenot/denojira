@@ -10,14 +10,18 @@ import { StoreDispatch } from '../../redux/store.ts'
 import { type Lane as LaneModel } from '../../../backend/models/Lane.ts'
 import { type CardResponse } from '../../../backend/models/Card.ts'
 import { type CardItem } from '../../dnd/CardItem.ts'
+import { type FetchStatus } from '../../redux/slices.ts'
 
 const { useDrop } = ReactDnD
 const { useDispatch } = ReactRedux
 
 interface Props {
+  // deno-lint-ignore no-explicit-any
   key?: any // TODO: nicer solution for this?
   lane: LaneModel
   cardData: CardResponse[]
+  cardsFetchError?: string
+  cardsFetchStatus: FetchStatus
 }
 
 export const Lane = ({ lane, cardData }: Props) => {
@@ -33,6 +37,7 @@ export const Lane = ({ lane, cardData }: Props) => {
     },
   }))
 
+  // TODO: add handling for card data not fully loaded or encountered an error
   return <div className='border-2 border-solid border-slate-600 rounded-lg p-2 flex-auto' ref={ref}>
     <div className='mx-auto'>
       <p className='font-semibold'>{lane.name}</p>

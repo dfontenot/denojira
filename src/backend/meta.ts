@@ -12,6 +12,7 @@ const isFileUrlString = (filename: string) => filename.startsWith('file://')
 const ensureFileUrlString = (filename: string | URL): string =>
   filename instanceof URL ? filename.toString() : (isFileUrlString(filename) ? filename : toFileUrl(filename).toString())
 
+// source: https://stackoverflow.com/a/47956767/854854
 export const trimFileExtension = (filename: string) => filename.substring(0, filename.lastIndexOf('.')) || filename
 export const getFilename = (metaUrl: string | URL) => basename(new URL('', ensureFileUrlString(metaUrl)).pathname)
 export const getDirectoryName = (metaUrl: string | URL) => new URL('.', ensureFileUrlString(metaUrl)).pathname
