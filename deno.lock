@@ -450,11 +450,14 @@
     "https://esm.sh/v113/@windicss/plugin-animations@1.0.9/deno/plugin-animations.mjs": "644ad66326a919baec92441013c6f9d99553df80fbe56a384cddc014717f502e",
     "https://esm.sh/v113/windicss@3.5.6/deno/lib.js": "cba5886acde53eba1ad1e722928a867385a0fe5c6956a2cac5044818dee3a750",
     "https://esm.sh/v113/windicss@3.5.6/deno/plugin.js": "e1b79fed06ed5293aecd7baaf5189f80b40244e879cda6343f2e057f38448b1d",
+    "https://esm.sh/v113/windicss@3.5.6/deno/plugin/forms.js": "ab68b2527a3c5934d0b6fe02c58b45ee98aaac876bf5cb491df341431e955363",
     "https://esm.sh/v113/windicss@3.5.6/deno/utils/parser.js": "b8fd1fe7295c13803d16bd48b8a3f5f80fb6ae23dae32acbcdc835dd4ad24695",
     "https://esm.sh/v113/windicss@3.5.6/lib/index.d.ts": "73fe8bc7d0341c25b2084df601148ae6b5b12488701f37a6782d1462bd35e3bf",
+    "https://esm.sh/v113/windicss@3.5.6/plugin/forms/index.d.ts": "f3f1e70b07ba728543142750cae9b640677f9a6fcc16c6353a3dc54a3fbb3cad",
     "https://esm.sh/v113/windicss@3.5.6/types/interfaces.d.ts": "452d83e59652ec2ae1e388c43d077e184bbec9e3c24199f9c96d9c9586587d78",
     "https://esm.sh/v113/windicss@3.5.6/types/lib/index.d.ts": "86590f3c5ef4a7ce2664e3650942bd51c1dd2648a83e22978a6b6339f770413c",
     "https://esm.sh/v113/windicss@3.5.6/types/lib/utilities/handler.d.ts": "3dc897a907626ef20ddd72d085ed3033df20eb078cc5f0008cb6d377bb712c08",
+    "https://esm.sh/v113/windicss@3.5.6/types/plugin/forms/index.d.ts": "dd604895162a8b92ee98c89539b7ffe92f37e3c6b6ee97e84313772d5ee4adf0",
     "https://esm.sh/v113/windicss@3.5.6/types/utils/parser/class.d.ts": "92b8c1df3c859078558ccb008880594359c0c905ee928054306b259d39f7f4b9",
     "https://esm.sh/v113/windicss@3.5.6/types/utils/parser/css.d.ts": "dc37467df4fa92b43d69e721fb30a3c1d77ec0ee0993e727bd3f7d7d55e12611",
     "https://esm.sh/v113/windicss@3.5.6/types/utils/parser/html.d.ts": "0335001659ca2a216adbc8e523bee65eab0534a4749e3554d0bcfcce4920a115",
@@ -565,6 +568,7 @@
     "https://esm.sh/v99/use-sync-external-store@1.2.0/es2020/shim.js": "6fc819a01c4bb4e9962d799ad643a104a698cb497a3fcd1f625fcd75454eb6cb",
     "https://esm.sh/v99/use-sync-external-store@1.2.0/es2020/shim/with-selector.js": "58fc89fb58d52171d35518340d9349601031622b0499a38884e62faa2ed8cf70",
     "https://esm.sh/windicss@3.5.6/lib": "dacf350c4272dacb04556b10abeca14931d2b69f44a00d70a7e9e5cc2d474d1d",
+    "https://esm.sh/windicss@3.5.6/plugin/forms": "72e7edaa082c24c0c2aa95eb8947ef3a6371df81e9e95b42974f0c9434e3ca8f",
     "https://esm.sh/windicss@3.5.6/utils/parser": "c69ab8392ceb7667235cf7eb1fec02f8e10976b6691aa0f27ec43087275717d8"
   }
 }

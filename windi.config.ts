@@ -1,8 +1,9 @@
 import {
   WindiCSSAnimations,
+  WindiCSSForms,
 } from './src/backend/deps.ts'
 
-export default {
+export const config = {
   theme: {
     extend: {
       colors: {
@@ -86,6 +87,7 @@ export default {
       settings: {
         animateSpeed: 1000,
       },
-    })
+    }),
+    WindiCSSForms,
   ],
 }

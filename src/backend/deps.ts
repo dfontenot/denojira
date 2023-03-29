@@ -17,5 +17,6 @@ export { React }
 export * as ReactDOMServer from 'https://esm.sh/react-dom@18/server'
 export * as Reflect from 'https://deno.land/x/reflect_metadata@v0.1.12/mod.ts'
 export { default as WindiCSSAnimations } from 'https://esm.sh/@windicss/plugin-animations'
+export { default as WindiCSSForms } from 'https://esm.sh/windicss@3.5/plugin/forms'
 export * as WindiCSSLib from 'https://esm.sh/windicss@3.5/lib'
 export * as WindiCSSParser from 'https://esm.sh/windicss@3.5/utils/parser'

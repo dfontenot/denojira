@@ -21,7 +21,7 @@ import {
 } from './src/backend/container.ts'
 import { getDirectoryName } from './src/backend/meta.ts'
 import * as DISymbols from './src/backend/types.ts'
-import * as windiConfig from './windi.config.ts'
+import { config as windiConfig } from './windi.config.ts'
 
 const {
   Application,
