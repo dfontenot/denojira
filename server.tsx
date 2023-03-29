@@ -21,10 +21,11 @@ import {
 } from './src/backend/container.ts'
 import { getDirectoryName } from './src/backend/meta.ts'
 import * as DISymbols from './src/backend/types.ts'
+import * as windiConfig from './windi.config.ts'
+
 const {
   Application,
   Router,
-  send,
 } = Oak
 const {
   asynciter,
@@ -86,7 +87,7 @@ router.get('/static/app.css', async (ctx) => {
     .concurrentUnorderedMap(async (entry) => { logger.debug(`reading file for windicss ${entry.path}`); return await Deno.readTextFile(entry.path) })
     .reduce('', (acc, item) => acc + item)
 
-  const processor = new Processor()
+  const processor = new Processor(windiConfig)
   const htmlClasses = new HTMLParser(tsxText).parseClasses().map((i) => i.result).join(' ')
   logger.debug(`encountered CSS classes ${htmlClasses}`)
   const preflight = processor.preflight(tsxText)

@@ -28,7 +28,7 @@ export const Card = ({ title, description, id, laneId }: Props) => {
 
   return (
     <article
-      className='grow-0 border-1 border-solid border-slate-600 rounded-lg'
+      className='grow-0 border-1 border-solid border-slate-600 rounded-lg p-2'
       ref={drag}
       style={{
         opacity: isDragging ? 0.5 : 1,
