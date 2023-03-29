@@ -53,11 +53,11 @@ export const CreateCard = () => {
 
   return <form ref={formRef} onSubmit={doCreateCard}>
     <label htmlFor='cardTitle'>title: </label>
-    <input type='text' name='cardTitle' value={state.title} onChange={(e) => updateTitle(e)} />
+    <input className='form-input px-4 py-3 rounded-lg' type='text' name='cardTitle' value={state.title} onChange={(e) => updateTitle(e)} />
     <label>
-      description: <textarea name='description' value={state.description} onChange={(e) => updateDescription(e)} />
+      description: <textarea className='form-textarea' name='description' value={state.description} onChange={(e) => updateDescription(e)} />
     </label>
-    <select name='laneId'>
+    <select className='form-select px-4 py-3 rounded-lg' name='laneId'>
       {lanes.map((lane, idx) => <option key={idx} value={lane.laneId}>{lane.name}</option>)}
     </select>
     <button type='submit'>Create</button>
