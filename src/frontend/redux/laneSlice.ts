@@ -1,6 +1,7 @@
 import {
   ReduxToolkit,
 } from '../deps.ts'
+import { type CreateLaneRequest } from '../../backend/handlers/LanesHandlers.ts'
 import { Lane } from '../../backend/models/Lane.ts'
 import { type FetchStatus } from './slices.ts'
 
@@ -12,6 +13,7 @@ const {
 export interface LaneState {
   lanes: Lane[],
   loadingStatus: FetchStatus,
+  laneCreationStatus: Record<string, FetchStatus>,
   error?: string
 }
 
@@ -21,11 +23,25 @@ export interface LaneSliceState {
 
 const initialState: LaneState = {
   lanes: [],
+  laneCreationStatus: {},
   loadingStatus: 'idle',
 }
 
 export const fetchLanesAction = createAsyncThunk('lanes/fetchLanes', async () => {
   return (await fetch('/api/lanes')).json()
+})
+
+export const createLaneAction = createAsyncThunk('lanes/createLane', async (req: CreateLaneRequest) => {
+  const result = await fetch('/api/lane', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(req),
+  })
+
+  return result.json
 })
 
 const lanesSlice = createSlice({
@@ -46,6 +62,18 @@ const lanesSlice = createSlice({
       .addCase(fetchLanesAction.rejected, (state, action) => {
         state.loadingStatus = 'failed'
         state.error = action.error.message
+      })
+      .addCase(createLaneAction.pending, (state, action) => {
+        console.log('create lane pending')
+        state.laneCreationStatus[action.meta.requestId] = 'loading'
+      })
+      .addCase(createLaneAction.fulfilled, (state, action) => {
+        console.log('create lane payload', action.payload);
+        state.laneCreationStatus[action.meta.requestId] = 'succeeded'
+      })
+      .addCase(createLaneAction.rejected, (state, action) => {
+        console.log('create lane failed')
+        state.laneCreationStatus[action.meta.requestId] = 'failed'
       })
   },
 })

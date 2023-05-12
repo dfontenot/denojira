@@ -9,14 +9,26 @@ const getLanesHandler = async (laneRepository: LaneRepository, ctx: Oak.Context)
   ctx.response.body = serializeWithBigIntQuoted(await laneRepository.getAllLanes())
 }
 
+export interface CreateLaneRequest {
+  name: string,
+  precedence: string | number,
+}
+
 const createNewLaneHandler = async (laneRepository: LaneRepository, ctx: Oak.Context) => {
-  const { value } = ctx.request.body({ type: 'json' })
-  const { name } = await value
-
-  const created = await laneRepository.createLane(name, true)
-
   ctx.response.headers.set('Content-Type', 'application/json')
-  ctx.response.body = serializeWithBigIntQuoted(created)
+
+  const { value } = ctx.request.body({ type: 'json' })
+  const { name, precedence: precedence_ }: CreateLaneRequest = await value
+  const precedence = parseInt(`${precedence_}`, 10)
+
+  if (isNaN(precedence)) {
+    ctx.response.status = Oak.Status.BadRequest
+    ctx.response.body = { error: `invalid lane precedence given` }
+  }
+  else {
+    const created = await laneRepository.createLane(name, precedence, true)
+    ctx.response.body = serializeWithBigIntQuoted(created)
+  }
 }
 
 const changeLaneEnableStatus = async (setEnableStatusTo: boolean, laneRepository: LaneRepository, ctx: Oak.Context) => {

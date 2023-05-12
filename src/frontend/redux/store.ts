@@ -19,6 +19,16 @@ cardCreationListenerMiddleware.startListening({
   },
 })
 
+const laneCreationListenerMiddleware = createListenerMiddleware()
+laneCreationListenerMiddleware.startListening({
+  type: 'lanes/createLane/fulfilled', // TODO: standard and more rename-friendly way of passing around this identifier?
+  effect: (_action, listenerApi) => {
+    console.log('in the lane creation reloading middleware')
+
+    listenerApi.dispatch(fetchCardsAction())
+  },
+})
+
 const cardMovedListenerMiddleware = createListenerMiddleware()
 cardMovedListenerMiddleware.startListening({
   type: 'cards/moveCard/fulfilled', // TODO: standard and more rename-friendly way of passing around this identifier?

@@ -122,7 +122,7 @@ export class DbCardRepository implements CardRepository {
         'cards.updated_at as card_updated_at',
         'lanes.id as lane_id',
         'name as lane_name'
-      ).innerJoin('lanes', 'cards.lane_id', 'lanes.id')
+      ).innerJoin('lanes', 'cards.lane_id', 'lanes.id').orderBy('cards.updated_at', 'desc')
 
       const results = await client.queryObject<RawCardInLane>(query.toString())
 

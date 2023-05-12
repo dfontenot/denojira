@@ -25,7 +25,7 @@ interface RawLaneRow {
 export interface LaneRepository {
   doesLaneExist(laneId: number | string): Promise<boolean>
   isLaneDisabled(laneId: number | string): Promise<boolean>
-  createLane(name: string, isEnabled: boolean): Promise<Lane>
+  createLane(name: string, precedence: number, isEnabled: boolean): Promise<Lane>
   getAllLanes(): Promise<Lane[]>
   setLaneEnableStatus(laneId: number | string, setTo: boolean): Promise<boolean>
 }
@@ -71,10 +71,10 @@ export class DbLaneRepository implements LaneRepository {
     })
   }
 
-  async createLane(name: string, isEnabled = true): Promise<Lane> {
+  async createLane(name: string, precedence: number, isEnabled = true): Promise<Lane> {
     return await this.client.queryWithClient(async (client) => {
 
-      const insertQuery = this.qb('lanes').insert([{ name, enabled: isEnabled }], ['id'])
+      const insertQuery = this.qb('lanes').insert([{ name, precedence, enabled: isEnabled }], ['id'])
       const result = await client.queryObject<RawLaneRow>(insertQuery.toString())
       this.logger.debug('created lane', result)
 
@@ -84,7 +84,7 @@ export class DbLaneRepository implements LaneRepository {
 
   async getAllLanes(): Promise<Lane[]> {
     return await this.client.queryWithClient(async (client) => {
-      const result = await client.queryObject<RawLaneRow>(this.qb('lanes').select('*').toString())
+      const result = await client.queryObject<RawLaneRow>(this.qb('lanes').select('*').orderBy('precedence').toString())
       return result.rows.map((row: RawLaneRow) => this.laneMapper(row))
     })
   }
