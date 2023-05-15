@@ -8,7 +8,7 @@ const dex = Dex({ client: 'postgres' })
 export const lanesCreateTableQuery = dex.schema.dropTableIfExists('lanes').createTable('lanes', (table) => {
   table.increments('id').primary()
   table.string('name', 256)
-  table.integer('precedence')
+  table.integer('precedence').unique()
   table.boolean('enabled')
   table.timestamps(true, true, false)
 })

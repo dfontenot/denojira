@@ -2,6 +2,7 @@ import {
   Dex,
   Inversify,
   Logger,
+  Postgres,
   Reflect,
 } from '../../deps.ts'
 import { getModuleName } from '../../meta.ts'
@@ -72,10 +73,18 @@ export class DbLaneRepository implements LaneRepository {
   }
 
   async createLane(name: string, precedence: number, isEnabled = true): Promise<Lane> {
-    return await this.client.queryWithClient(async (client) => {
+    return await this.client.withTransaction<Lane>(`create-lane-${name}`, undefined, async (tx: Postgres.Transaction) => {
+      const precedenceExistsQuery = this.qb('lanes').select(1).where('precedence', precedence).groupBy('id').limit(1)
+      const precedenceExists = (await tx.queryObject(precedenceExistsQuery.toString())).rows.length > 1
+
+      if (precedenceExists) {
+        const shiftLanesQuery = this.qb('lanes').increment('precedence').where('precedence', '>=', precedence)
+        const numUpdated = (await tx.queryObject(shiftLanesQuery.toString())).rows.length
+        this.logger.info(`adjusted ${numUpdated} lanes`)
+      }
 
       const insertQuery = this.qb('lanes').insert([{ name, precedence, enabled: isEnabled }], ['id'])
-      const result = await client.queryObject<RawLaneRow>(insertQuery.toString())
+      const result = await tx.queryObject<RawLaneRow>(insertQuery.toString())
       this.logger.debug('created lane', result)
 
       return this.laneMapper(result.rows[0])
