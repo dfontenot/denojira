@@ -46,7 +46,7 @@ export const CreateLane = () => {
 
     dispatch(createLaneAction({
       name: form['laneName'].value,
-      precedence: state.addingBeforeOtherLane ? otherLanePrecedence - 1 : otherLanePrecedence + 1,
+      precedence: state.addingBeforeOtherLane ? otherLanePrecedence : otherLanePrecedence + 1,
     }))
 
     console.log('created lane')
