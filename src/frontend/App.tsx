@@ -8,7 +8,7 @@ const { DndProvider } = ReactDnD
 const { HTML5Backend } = ReactDnDHTML5
 
 import { Lanes } from './components/Lanes/index.tsx'
-import { CreateCard } from './components/CreateCard/index.tsx'
+import { ManageTasks } from './components/ManageTasks/index.tsx'
 import { store } from './redux/store.ts'
 
 const { Provider } = ReactRedux
@@ -21,7 +21,7 @@ export const App = () =>
           Organize your tasks
         </div>
         <Lanes />
-        <CreateCard />
+        <ManageTasks />
       </div>
     </DndProvider>
   </Provider>

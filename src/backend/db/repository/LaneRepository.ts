@@ -74,6 +74,8 @@ export class DbLaneRepository implements LaneRepository {
 
   async createLane(name: string, precedence: number, isEnabled = true): Promise<Lane> {
     return await this.client.withTransaction<Lane>(`create-lane-${name}`, undefined, async (tx: Postgres.Transaction) => {
+      await tx.begin()
+
       const precedenceExistsQuery = this.qb('lanes').select(1).where('precedence', precedence).groupBy('id').limit(1)
       const precedenceExists = (await tx.queryObject(precedenceExistsQuery.toString())).rows.length > 1
 
@@ -86,6 +88,8 @@ export class DbLaneRepository implements LaneRepository {
       const insertQuery = this.qb('lanes').insert([{ name, precedence, enabled: isEnabled }], ['id'])
       const result = await tx.queryObject<RawLaneRow>(insertQuery.toString())
       this.logger.debug('created lane', result)
+
+      tx.commit()
 
       return this.laneMapper(result.rows[0])
     })
