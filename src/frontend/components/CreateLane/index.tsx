@@ -52,7 +52,7 @@ export const CreateLane = () => {
     console.log('created lane')
   }
 
-  return <div className='content-evenly'>
+  return <div className='basis-1/2'>
     <form ref={formRef} onSubmit={doCreateLane}>
       <div className='container mx-auto px-2 my-6'>
         <div className='text-xl maw-w-prose'>
