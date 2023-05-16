@@ -11,6 +11,7 @@ import { type Lane as LaneModel } from '../../../backend/models/Lane.ts'
 import { type CardResponse } from '../../../backend/models/Card.ts'
 import { type CardItem } from '../../dnd/CardItem.ts'
 import { type FetchStatus } from '../../redux/slices.ts'
+import { IconCloseO } from '../Icons/index.tsx'
 
 const { useDrop } = ReactDnD
 const { useDispatch } = ReactRedux
@@ -38,7 +39,8 @@ export const Lane = ({ lane, cardData }: Props) => {
   }))
 
   // TODO: add handling for card data not fully loaded or encountered an error
-  return <div className='border-2 border-solid border-slate-600 rounded-lg p-2 flex-auto' ref={ref}>
+  return <div className='border-2 border-solid border-slate-600 rounded-lg p-2 flex-auto relative' ref={ref}>
+    <IconCloseO className='absolute top-0.5 right-0.5' />
     <div className='mx-auto'>
       <p className='font-semibold'>{lane.name}</p>
     </div>
