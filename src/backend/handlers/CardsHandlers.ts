@@ -50,7 +50,6 @@ const createNewCardHandler = async (cardRepository: CardRepository, ctx: Oak.Con
   ctx.response.body = serializeWithBigIntQuoted(created)
 }
 
-
 const moveCardHandler = async (cardRepository: CardRepository, ctx: Oak.Context) => {
   const { value } = ctx.request.body({ type: 'json' })
   const { cardId, destinationLaneId }: MoveCardRequest = await value

@@ -1,17 +1,13 @@
 import {
   Oak,
 } from '../deps.ts'
+import { type CreateLaneRequest } from '../../shared/handlers/Lanes.ts'
 import { serializeWithBigIntQuoted } from './utils.ts'
 import { LaneRepository } from '../db/repository/LaneRepository.ts'
 
 const getLanesHandler = async (laneRepository: LaneRepository, ctx: Oak.Context) => {
 
   ctx.response.body = serializeWithBigIntQuoted(await laneRepository.getAllLanes())
-}
-
-export interface CreateLaneRequest {
-  name: string,
-  precedence: string | number,
 }
 
 const createNewLaneHandler = async (laneRepository: LaneRepository, ctx: Oak.Context) => {
