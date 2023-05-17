@@ -1,7 +1,7 @@
 import {
   ReduxToolkit,
 } from '../deps.ts'
-import laneSlice from './laneSlice.ts'
+import laneSlice, { fetchLanesAction } from './laneSlice.ts'
 import cardsSlice, { fetchCardsAction } from './cardsSlice.ts'
 
 const {
@@ -25,7 +25,7 @@ laneCreationListenerMiddleware.startListening({
   effect: (_action, listenerApi) => {
     console.log('in the lane creation reloading middleware')
 
-    listenerApi.dispatch(fetchCardsAction())
+    listenerApi.dispatch(fetchLanesAction())
   },
 })
 
@@ -48,7 +48,9 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(
       cardCreationListenerMiddleware.middleware,
-      cardMovedListenerMiddleware.middleware,),
+      cardMovedListenerMiddleware.middleware,
+      laneCreationListenerMiddleware.middleware,
+    ),
 })
 
 // source: https://stackoverflow.com/a/73151014/854854
