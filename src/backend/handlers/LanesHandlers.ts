@@ -36,11 +36,25 @@ const changeLaneEnableStatus = async (setEnableStatusTo: boolean, laneRepository
   }
 }
 
+const deleteLaneHandler = async (laneRepository: LaneRepository, ctx: Oak.Context) => {
+  const { laneId } = Oak.helpers.getQuery(ctx, { mergeParams: true })
+  const deletionResult = await laneRepository.deleteLane(laneId)
+
+  if (! deletionResult) {
+    ctx.response.status = Oak.Status.NotFound
+    ctx.response.body = { error: `no such lane id '${laneId}'` }
+  }
+  else {
+    ctx.response.body = { deleted: deletionResult }
+  }
+}
+
 const enableLaneHandler = async (laneRepository: LaneRepository, ctx: Oak.Context) => await changeLaneEnableStatus(true, laneRepository, ctx)
 const disableLaneHandler = async (laneRepository: LaneRepository, ctx: Oak.Context) => await changeLaneEnableStatus(false, laneRepository, ctx)
 
 export {
   createNewLaneHandler,
+  deleteLaneHandler,
   disableLaneHandler,
   enableLaneHandler,
   getLanesHandler,

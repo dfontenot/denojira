@@ -28,6 +28,7 @@ import {
   createNewCardHandler,
   createNewLaneHandler,
   deleteCardHandler,
+  deleteLaneHandler,
   disableLaneHandler,
   enableLaneHandler,
   getCardsHandler,
@@ -112,6 +113,8 @@ export const makeContainer = () => {
     (ctx: Oak.Context) => disableLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
   container.bind<OakHandler>(DISymbols.EnableLaneHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
     (ctx: Oak.Context) => enableLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+  container.bind<OakHandler>(DISymbols.DeleteLaneHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
+    (ctx: Oak.Context) => deleteLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
 
   return container
 }

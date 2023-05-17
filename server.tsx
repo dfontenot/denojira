@@ -125,6 +125,7 @@ router.get('/api/lanes', container.get<OakHandler>(DISymbols.GetLanesHandlerId))
 router.put('/api/lane/:laneId/disable', container.get<OakHandler>(DISymbols.DisableLaneHandlerId))
 router.put('/api/lane/:laneId/enable', container.get<OakHandler>(DISymbols.EnableLaneHandlerId))
 router.post('/api/lane', container.get<OakHandler>(DISymbols.CreateLaneHandlerId))
+router.delete('/api/lane/:laneId', container.get<OakHandler>(DISymbols.DeleteLaneHandlerId))
 
 router.get('/api/cards', container.get<OakHandler>(DISymbols.GetCardsHandlerId))
 router.post('/api/card', container.get<OakHandler>(DISymbols.CreateNewCardHandlerId))

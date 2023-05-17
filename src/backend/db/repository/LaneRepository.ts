@@ -29,6 +29,7 @@ export interface LaneRepository {
   createLane(name: string, precedence: number, isEnabled: boolean): Promise<Lane>
   getAllLanes(): Promise<Lane[]>
   setLaneEnableStatus(laneId: number | string, setTo: boolean): Promise<boolean>
+  deleteLane(laneId: number | string): Promise<boolean>
 }
 
 @injectable()
@@ -106,6 +107,16 @@ export class DbLaneRepository implements LaneRepository {
     return await this.client.queryWithClient(async (client) => {
       const result = await client.queryObject(this.qb('lanes').where('id', `${laneId}`).update({ enabled: setTo }))
       return (result.rowCount || 0) == 1
+    })
+  }
+
+  async deleteLane(laneId: number | string): Promise<boolean> {
+    return await this.client.queryWithClient(async (client) => {
+
+      const query = this.qb('lanes').where('id', laneId).delete()
+      const results = await client.queryObject(query.toString())
+
+      return (results.rowCount || 0) == 1
     })
   }
 }
