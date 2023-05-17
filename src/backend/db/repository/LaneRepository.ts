@@ -6,7 +6,7 @@ import {
   Reflect,
 } from '../../deps.ts'
 import { getModuleName } from '../../meta.ts'
-import { Lane } from '../../models/Lane.ts'
+import { Lane } from '../../../shared/models/Lane.ts'
 import { type DbClient } from '../DbClient.ts'
 import { DbClientId } from '../../types.ts'
 const {

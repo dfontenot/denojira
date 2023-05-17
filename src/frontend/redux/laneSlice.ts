@@ -2,7 +2,7 @@ import {
   ReduxToolkit,
 } from '../deps.ts'
 import { type CreateLaneRequest } from '../../backend/handlers/LanesHandlers.ts'
-import { Lane } from '../../backend/models/Lane.ts'
+import { Lane } from '../../shared/models/Lane.ts'
 import { type FetchStatus } from './slices.ts'
 
 const {

@@ -13,8 +13,8 @@ import {
 import { LoadingNotice } from './LoadingNotice.tsx'
 import { type FetchStatus } from '../../redux/slices.ts'
 import { StoreDispatch } from '../../redux/store.ts'
-import { type Lane as LaneModel } from '../../../backend/models/Lane.ts'
-import { type GetCardsResponse } from '../../../backend/models/Card.ts'
+import { type Lane as LaneModel } from '../../../shared/models/Lane.ts'
+import { type GetCardsResponse } from '../../../shared/models/Card.ts'
 import { Lane } from '../Lane/index.tsx'
 
 const {

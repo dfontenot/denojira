@@ -9,35 +9,30 @@ const {
   createListenerMiddleware,
 } = ReduxToolkit
 
-const cardCreationListenerMiddleware = createListenerMiddleware()
-cardCreationListenerMiddleware.startListening({
-  type: 'cards/createCard/fulfilled', // TODO: standard and more rename-friendly way of passing around this identifier?
-  effect: (_action, listenerApi) => {
-    console.log('in the card creation reloading middleware')
+interface BulkCreateMiddlewareParams {
+  middlewareType: string,
+  actionType: 'card' | 'lane'
+}
 
-    listenerApi.dispatch(fetchCardsAction())
-  },
-})
+// TODO: actual type
+const bulkCreateMiddleware = (opts: BulkCreateMiddlewareParams[]): any[] =>
+  opts.map((opt) => {
+    const middleware = createListenerMiddleware()
+    middleware.startListening({
+      type: `${opt.actionType}s/${opt.middlewareType}/fulfilled`,
+      effect: (_action, listenerApi) => {
+        listenerApi.dispatch(opt.actionType == 'card' ? fetchCardsAction() : fetchLanesAction())
+      },
+    })
 
-const laneCreationListenerMiddleware = createListenerMiddleware()
-laneCreationListenerMiddleware.startListening({
-  type: 'lanes/createLane/fulfilled', // TODO: standard and more rename-friendly way of passing around this identifier?
-  effect: (_action, listenerApi) => {
-    console.log('in the lane creation reloading middleware')
+    return middleware.middleware
+  })
 
-    listenerApi.dispatch(fetchLanesAction())
-  },
-})
-
-const cardMovedListenerMiddleware = createListenerMiddleware()
-cardMovedListenerMiddleware.startListening({
-  type: 'cards/moveCard/fulfilled', // TODO: standard and more rename-friendly way of passing around this identifier?
-  effect: (_action, listenerApi) => {
-    console.log('in the card moved reloading middleware')
-
-    listenerApi.dispatch(fetchCardsAction())
-  },
-})
+const allListeningMiddleware = bulkCreateMiddleware([
+  { middlewareType: 'createCard', actionType: 'card' },
+  { middlewareType: 'moveCardCard', actionType: 'card' },
+  { middlewareType: 'createLane', actionType: 'lane' },
+])
 
 export const store = configureStore({
   reducer: {
@@ -46,11 +41,7 @@ export const store = configureStore({
   },
   devTools: true,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().prepend(
-      cardCreationListenerMiddleware.middleware,
-      cardMovedListenerMiddleware.middleware,
-      laneCreationListenerMiddleware.middleware,
-    ),
+    getDefaultMiddleware().prepend(...allListeningMiddleware),
 })
 
 // source: https://stackoverflow.com/a/73151014/854854

@@ -1,7 +1,7 @@
 import {
   ReduxToolkit,
 } from '../deps.ts'
-import { type GetCardsResponse } from '../../backend/models/Card.ts'
+import { type GetCardsResponse } from '../../shared/models/Card.ts'
 import {
   type CreateCardRequest,
   type MoveCardRequest,

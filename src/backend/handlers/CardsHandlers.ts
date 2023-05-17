@@ -10,7 +10,7 @@ import { getModuleName } from '../meta.ts'
 import {
   CardResponse,
   GetCardsResponse
-} from '../models/Card.ts'
+} from '../../shared/models/Card.ts'
 import { serializeWithBigIntQuoted } from './utils.ts'
 const { getLogger } = Logger
 

@@ -8,7 +8,7 @@ import {
 import { getModuleName, getDirectoryName } from '../../meta.ts'
 import { type DbClient } from '../DbClient.ts'
 import { LaneRepository } from './LaneRepository.ts'
-import { Card } from '../../models/Card.ts'
+import { Card } from '../../../shared/models/Card.ts'
 import {
   DbClientId,
   LaneRepositoryFactoryId,
