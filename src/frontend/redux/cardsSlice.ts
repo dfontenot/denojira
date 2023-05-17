@@ -1,9 +1,9 @@
 import {
   ReduxToolkit,
 } from '../deps.ts'
-import { type GetCardsResponse } from '../../shared/models/Card.ts'
 import {
   type CreateCardRequest,
+  type GetCardsResponse,
   type MoveCardRequest,
 } from '../../shared/handlers/Cards.ts'
 import { type FetchStatus } from './slices.ts'

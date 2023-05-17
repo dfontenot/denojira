@@ -9,10 +9,8 @@ import {
 import { getModuleName } from '../meta.ts'
 import {
   CardResponse,
-  GetCardsResponse
-} from '../../shared/models/Card.ts'
-import {
   CreateCardRequest,
+  GetCardsResponse,
   MoveCardRequest,
 } from '../../shared/handlers/Cards.ts'
 import { serializeWithBigIntQuoted } from './utils.ts'
