@@ -30,7 +30,8 @@ const bulkCreateMiddleware = (opts: BulkCreateMiddlewareParams[]): any[] =>
 
 const allListeningMiddleware = bulkCreateMiddleware([
   { middlewareType: 'createCard', actionType: 'card' },
-  { middlewareType: 'moveCardCard', actionType: 'card' },
+  { middlewareType: 'moveCard', actionType: 'card' },
+  { middlewareType: 'deleteCard', actionType: 'card' },
   { middlewareType: 'createLane', actionType: 'lane' },
 ])
 

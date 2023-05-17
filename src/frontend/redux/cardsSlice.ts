@@ -19,6 +19,7 @@ export interface CardsState {
   error?: string
   cardCreationStatus: Record<string, FetchStatus>
   moveCardStatus: Record<string, FetchStatus>
+  deleteCardStatus: Record<string, FetchStatus>
 }
 
 export interface CardsSliceState {
@@ -30,6 +31,7 @@ const initialState: CardsState = {
   loadingStatus: 'idle',
   cardCreationStatus: {},
   moveCardStatus: {},
+  deleteCardStatus: {},
 }
 
 export const fetchCardsAction = createAsyncThunk('cards/fetchCards', async () => {
@@ -62,6 +64,17 @@ export const moveCardAction = createAsyncThunk('cards/moveCard', async (req: Mov
   return result.json
 })
 
+export const deleteCardAction = createAsyncThunk('cards/deleteCard', async (cardId: number | string) => {
+  const result = await fetch(`/api/card/${cardId}`, {
+    method: 'DELETE',
+    headers: {
+      'Accept': 'application/json',
+    },
+  })
+
+  return result.json
+})
+
 const cardsSlice = createSlice({
   name: 'cards',
   initialState: initialState,
@@ -74,7 +87,7 @@ const cardsSlice = createSlice({
       })
       .addCase(fetchCardsAction.fulfilled, (state, action) => {
         state.loadingStatus = 'succeeded'
-        console.log('payload', action.payload);
+        console.log('payload', action.payload)
         state.groupedCards = action.payload
       })
       .addCase(fetchCardsAction.rejected, (state, action) => {
@@ -86,8 +99,8 @@ const cardsSlice = createSlice({
         state.cardCreationStatus[action.meta.requestId] = 'loading'
       })
       .addCase(createCardAction.fulfilled, (state, action) => {
-        console.log('create card payload', action.payload);
-        state.cardCreationStatus[action.meta.requestId] = 'succeeded'
+        console.log('create card payload', action.payload)
+        delete state.cardCreationStatus[action.meta.requestId]
       })
       .addCase(createCardAction.rejected, (state, action) => {
         console.log('create card failed')
@@ -98,12 +111,24 @@ const cardsSlice = createSlice({
         state.moveCardStatus[action.meta.requestId] = 'loading'
       })
       .addCase(moveCardAction.fulfilled, (state, action) => {
-        console.log('move card payload', action.payload);
-        state.moveCardStatus[action.meta.requestId] = 'succeeded'
+        console.log('move card payload', action.payload)
+        delete state.moveCardStatus[action.meta.requestId]
       })
       .addCase(moveCardAction.rejected, (state, action) => {
         console.log('move card failed')
         state.moveCardStatus[action.meta.requestId] = 'failed'
+      })
+      .addCase(deleteCardAction.pending, (state, action) => {
+        console.log('delete card pending')
+        state.deleteCardStatus[action.meta.requestId] = 'loading'
+      })
+      .addCase(deleteCardAction.fulfilled, (state, action) => {
+        console.log('delete card payload', action.payload)
+        delete state.deleteCardStatus[action.meta.requestId]
+      })
+      .addCase(deleteCardAction.rejected, (state, action) => {
+        console.log('delete card failed')
+        state.deleteCardStatus[action.meta.requestId] = 'failed'
       })
   },
 })
