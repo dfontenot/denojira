@@ -28,11 +28,13 @@ const bulkCreateMiddleware = (opts: BulkCreateMiddlewareParams[]): any[] =>
     return middleware.middleware
   })
 
+// TODO: do less whole board reloading when possible
 const allListeningMiddleware = bulkCreateMiddleware([
   { middlewareType: 'createCard', actionType: 'card' },
-  { middlewareType: 'moveCard', actionType: 'card' },
   { middlewareType: 'deleteCard', actionType: 'card' },
+  { middlewareType: 'moveCard', actionType: 'card' },
   { middlewareType: 'createLane', actionType: 'lane' },
+  { middlewareType: 'deleteLane', actionType: 'lane' },
 ])
 
 export const store = configureStore({

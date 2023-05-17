@@ -4,6 +4,7 @@ import {
   ReactRedux,
 } from '../../deps.ts'
 import { moveCardAction } from '../../redux/cardsSlice.ts'
+import { deleteLaneAction } from '../../redux/laneSlice.ts'
 import { cardSym } from '../../dnd/syms.ts'
 import { Cards } from '../Cards/index.tsx'
 import { StoreDispatch } from '../../redux/store.ts'
@@ -38,9 +39,22 @@ export const Lane = ({ lane, cardData }: Props) => {
     },
   }))
 
+  const doDelete = (_e: React.MouseEvent<HTMLElement>) => {
+    dispatch(deleteLaneAction(lane.laneId))
+  }
+
   // TODO: add handling for card data not fully loaded or encountered an error
   return <div className='border-2 border-solid border-slate-600 rounded-lg p-2 flex-auto relative' ref={ref}>
-    <IconCloseO className='absolute top-0.5 right-0.5' />
+    <div
+      className='hover:cursor-pointer'
+      onClick={(e) => doDelete(e)}
+      tabIndex={0}
+      title='delete swimlane'
+      role='button'
+      aria-label={`delete swimlane ${lane.name}`}
+    >
+      <IconCloseO className='absolute top-0.5 right-0.5' />
+    </div>
     <div className='mx-auto'>
       <p className='font-semibold'>{lane.name}</p>
     </div>

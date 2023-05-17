@@ -36,6 +36,7 @@ const changeLaneEnableStatus = async (setEnableStatusTo: boolean, laneRepository
   }
 }
 
+// TODO: give caller option to have all tasks in the lane moved to another lane instead of cascade deleted
 const deleteLaneHandler = async (laneRepository: LaneRepository, ctx: Oak.Context) => {
   const { laneId } = Oak.helpers.getQuery(ctx, { mergeParams: true })
   const deletionResult = await laneRepository.deleteLane(laneId)

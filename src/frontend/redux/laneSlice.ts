@@ -14,6 +14,7 @@ export interface LaneState {
   lanes: Lane[],
   loadingStatus: FetchStatus,
   laneCreationStatus: Record<string, FetchStatus>,
+  laneDeletionStatus: Record<string, FetchStatus>,
   error?: string
 }
 
@@ -24,6 +25,7 @@ export interface LaneSliceState {
 const initialState: LaneState = {
   lanes: [],
   laneCreationStatus: {},
+  laneDeletionStatus: {},
   loadingStatus: 'idle',
 }
 
@@ -39,6 +41,17 @@ export const createLaneAction = createAsyncThunk('lanes/createLane', async (req:
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(req),
+  })
+
+  return result.json
+})
+
+export const deleteLaneAction = createAsyncThunk('lanes/deleteLane', async (laneId: number | string) => {
+  const result = await fetch(`/api/lane/${laneId}`, {
+    method: 'DELETE',
+    headers: {
+      'Accept': 'application/json',
+    },
   })
 
   return result.json
@@ -69,11 +82,23 @@ const lanesSlice = createSlice({
       })
       .addCase(createLaneAction.fulfilled, (state, action) => {
         console.log('create lane payload', action.payload);
-        state.laneCreationStatus[action.meta.requestId] = 'succeeded'
+        delete state.laneCreationStatus[action.meta.requestId]
       })
       .addCase(createLaneAction.rejected, (state, action) => {
         console.log('create lane failed')
         state.laneCreationStatus[action.meta.requestId] = 'failed'
+      })
+      .addCase(deleteLaneAction.pending, (state, action) => {
+        console.log('delete lane pending')
+        state.laneDeletionStatus[action.meta.requestId] = 'loading'
+      })
+      .addCase(deleteLaneAction.fulfilled, (state, action) => {
+        console.log('delete lane payload', action.payload);
+        delete state.laneDeletionStatus[action.meta.requestId]
+      })
+      .addCase(deleteLaneAction.rejected, (state, action) => {
+        console.log('delete lane failed')
+        state.laneDeletionStatus[action.meta.requestId] = 'failed'
       })
   },
 })
