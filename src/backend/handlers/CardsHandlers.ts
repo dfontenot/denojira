@@ -11,6 +11,10 @@ import {
   CardResponse,
   GetCardsResponse
 } from '../../shared/models/Card.ts'
+import {
+  CreateCardRequest,
+  MoveCardRequest,
+} from '../../shared/handlers/Cards.ts'
 import { serializeWithBigIntQuoted } from './utils.ts'
 const { getLogger } = Logger
 
@@ -38,12 +42,6 @@ const getCardsHandler = async (cardRepository: CardRepository, ctx: Oak.Context)
   ctx.response.body = serializeWithBigIntQuoted(grouped)
 }
 
-export interface CreateCardRequest {
-  title: string,
-  description: string,
-  laneId: number | string,
-}
-
 const createNewCardHandler = async (cardRepository: CardRepository, ctx: Oak.Context) => {
   const { value } = ctx.request.body({ type: 'json' })
   const { title, description, laneId }: CreateCardRequest = await value
@@ -54,10 +52,6 @@ const createNewCardHandler = async (cardRepository: CardRepository, ctx: Oak.Con
   ctx.response.body = serializeWithBigIntQuoted(created)
 }
 
-export interface MoveCardRequest {
-  cardId: number | string,
-  destinationLaneId: number | string,
-}
 
 const moveCardHandler = async (cardRepository: CardRepository, ctx: Oak.Context) => {
   const { value } = ctx.request.body({ type: 'json' })

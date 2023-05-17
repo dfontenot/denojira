@@ -5,7 +5,7 @@ import { type GetCardsResponse } from '../../shared/models/Card.ts'
 import {
   type CreateCardRequest,
   type MoveCardRequest,
-} from '../../backend/handlers/CardsHandlers.ts'
+} from '../../shared/handlers/Cards.ts'
 import { type FetchStatus } from './slices.ts'
 
 const {
