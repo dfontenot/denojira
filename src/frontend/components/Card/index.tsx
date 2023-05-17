@@ -44,7 +44,14 @@ export const Card = ({ title, description, id, laneId }: Props) => {
       style={{
         opacity: isDragging ? 0.5 : 1,
       }}>
-      <div className='hover:cursor-pointer' onClick={(e) => doDelete(e)}>
+      <div
+        className='hover:cursor-pointer'
+        onClick={(e) => doDelete(e)}
+        tabIndex={0}
+        title='delete'
+        role='button'
+        aria-label={`delete card ${title}`}
+      >
         <IconClose className='absolute top-0.5 right-0.5' />
       </div>
       <div className='font-medium'>
