@@ -1,13 +1,9 @@
 import {
-  ReduxToolkit,
-} from '../deps.ts'
-import laneSlice, { fetchLanesAction } from './laneSlice.ts'
-import cardsSlice, { fetchCardsAction } from './cardsSlice.ts'
-
-const {
   configureStore,
   createListenerMiddleware,
-} = ReduxToolkit
+} from 'redux-toolkit'
+import laneSlice, { fetchLanesAction } from './laneSlice.ts'
+import cardsSlice, { fetchCardsAction } from './cardsSlice.ts'
 
 interface BulkCreateMiddlewareParams {
   middlewareType: string,
@@ -44,7 +40,7 @@ export const store = configureStore({
   },
   devTools: true,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().prepend(...allListeningMiddleware),
+    getDefaultMiddleware().concat(allListeningMiddleware),
 })
 
 // source: https://stackoverflow.com/a/73151014/854854

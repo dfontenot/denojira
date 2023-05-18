@@ -1,23 +1,23 @@
-import {
-  React,
-  ReactDnD,
-  ReactRedux,
-} from '../../deps.ts'
+import React from 'react'
+import { useContext } from 'react'
+import { useDrop } from 'react-dnd'
+import { useDispatch } from 'react-redux'
 import { moveCardAction } from '../../redux/cardsSlice.ts'
 import { deleteLaneAction } from '../../redux/laneSlice.ts'
 import { cardSym } from '../../dnd/syms.ts'
-import { Cards } from '../Cards/index.tsx'
+import { type CardsProps } from '../Cards/index.tsx'
 import { StoreDispatch } from '../../redux/store.ts'
 import { type Lane as LaneModel } from '../../../shared/models/Lane.ts'
 import { type CardResponse } from '../../../shared/handlers/Cards.ts'
 import { type CardItem } from '../../dnd/CardItem.ts'
 import { type FetchStatus } from '../../redux/slices.ts'
-import { IconCloseO } from '../Icons/index.tsx'
+import {
+  CardsSymbol,
+  DIContext,
+  IconCloseOSymbol,
+} from '../../diSymbols.ts'
 
-const { useDrop } = ReactDnD
-const { useDispatch } = ReactRedux
-
-interface Props {
+export interface LaneProps {
   // deno-lint-ignore no-explicit-any
   key?: any // TODO: nicer solution for this?
   lane: LaneModel
@@ -26,9 +26,13 @@ interface Props {
   cardsFetchStatus: FetchStatus
 }
 
-export const Lane = ({ lane, cardData }: Props) => {
+export const Lane = ({ lane, cardData }: LaneProps) => {
 
   const dispatch = useDispatch<StoreDispatch>()
+
+  const diContext = useContext(DIContext)
+  const IconCloseO = diContext![IconCloseOSymbol] as React.FC<React.SVGProps<SVGSVGElement>>
+  const Cards = diContext![CardsSymbol] as React.FC<CardsProps>
 
   const [_, ref] = useDrop(() => ({
     accept: cardSym,

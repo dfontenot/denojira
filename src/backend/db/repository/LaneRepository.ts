@@ -1,19 +1,14 @@
+import Dex from 'dex'
 import {
-  Dex,
-  Inversify,
-  Logger,
-  Postgres,
-  Reflect,
-} from '../../deps.ts'
+  inject,
+  injectable,
+} from 'inversify'
+import { getLogger } from 'logger'
+import * as Postgres from 'postgres'
 import { getModuleName } from '../../meta.ts'
 import { Lane } from '../../../shared/models/Lane.ts'
 import { type DbClient } from '../DbClient.ts'
 import { DbClientId } from '../../types.ts'
-const {
-  inject,
-  injectable,
-} = Inversify
-const { getLogger } = Logger
 
 interface RawLaneRow {
   id: number,

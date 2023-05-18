@@ -1,12 +1,9 @@
+import * as Postgres from 'postgres'
 import {
-  Inversify,
-  Postgres,
-} from '../deps.ts'
-import { DbConnectionPoolId } from '../types.ts'
-const {
   inject,
   injectable,
-} = Inversify
+} from 'inversify'
+import { DbConnectionPoolId } from '../types.ts'
 
 export type PoolOrTx = Postgres.Pool | Postgres.Transaction
 export type PoolClientOrTx = Postgres.PoolClient | Postgres.Transaction

@@ -1,14 +1,10 @@
 import {
-  ReduxToolkit,
-} from '../deps.ts'
+  createAsyncThunk,
+  createSlice,
+} from 'redux-toolkit'
 import { type CreateLaneRequest } from '../../shared/handlers/Lanes.ts'
 import { Lane } from '../../shared/models/Lane.ts'
 import { type FetchStatus } from './slices.ts'
-
-const {
-  createAsyncThunk,
-  createSlice
-} = ReduxToolkit
 
 export interface LaneState {
   lanes: Lane[],

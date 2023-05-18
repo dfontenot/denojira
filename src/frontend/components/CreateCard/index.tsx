@@ -1,20 +1,16 @@
+import React from 'react'
 import {
-  React,
-  ReactRedux,
-} from '../../deps.ts'
+  useRef,
+  useState,
+} from 'react'
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux'
 import { StoreDispatch } from '../../redux/store.ts'
 import { createCardAction } from '../../redux/cardsSlice.ts'
 import { LaneSliceState } from '../../redux/laneSlice.ts'
 import { Lane } from '../../../shared/models/Lane.ts'
-
-const {
-  useRef,
-  useState
-} = React
-const {
-  useDispatch,
-  useSelector
-} = ReactRedux
 
 interface State {
   title: string

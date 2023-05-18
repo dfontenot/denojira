@@ -1,19 +1,28 @@
+import { Reflect } from 'reflect'
+Reflect.getMetadata('foo', {}) // dummy call to keep reflect imported
+import { asynciter } from 'asynciter'
+import * as ESBuild from 'esbuild'
+import * as ESBuildDenoLoader from 'esbuild-deno-loader'
+import { walk } from 'fs'
 import {
-  Asynciter,
-  ESBuild,
-  ESBuildDenoLoader,
-  Fs,
-  Logger,
-  Mustache,
-  Oak,
-  Path,
-  WindiCSSLib,
-  WindiCSSParser,
-} from './src/backend/deps.ts'
+  getLogger,
+  setup as loggerSetup,
+  LogConfig,
+} from 'logger'
+import * as Mustache from 'mustache'
 import {
-  React,
-  ReactDOMServer,
-} from './src/frontend/deps.ts'
+  join,
+  resolve,
+  toFileUrl,
+} from 'path'
+import { Processor } from 'windicss-lib'
+import { HTMLParser } from 'windicss-parser'
+import React from 'react'
+import { renderToString } from 'react-dom-server'
+import {
+  Application,
+  Router,
+} from 'oak'
 import { App } from './src/frontend/App.tsx'
 import {
   makeContainer,
@@ -23,35 +32,9 @@ import { getDirectoryName } from './src/backend/meta.ts'
 import * as DISymbols from './src/backend/types.ts'
 import { config as windiConfig } from './windi.config.ts'
 
-const {
-  Application,
-  Router,
-} = Oak
-const {
-  asynciter,
-} = Asynciter
-const {
-  Processor,
-} = WindiCSSLib
-const {
-  HTMLParser,
-} = WindiCSSParser
-const {
-  walk,
-} = Fs
-const {
-  join,
-} = Path
-const {
-  renderToString,
-} = ReactDOMServer
-const {
-  getLogger,
-} = Logger
-
 const container = makeContainer()
 
-Logger.setup(await container.getAsync<Logger.LogConfig>(DISymbols.LoggerConfigId))
+loggerSetup(await container.getAsync<LogConfig>(DISymbols.LoggerConfigId))
 
 // TODO: move into inversify container
 const app = new Application()
@@ -113,7 +96,10 @@ router.get('/static/app.js', async (ctx) => {
     bundle: true,
     loader: { '.tsx': 'tsx' },
     plugins: [
-      ESBuildDenoLoader.denoPlugin(),
+      ESBuildDenoLoader.denoPlugin({
+        // TODO: detect import-map being used in run.sh and use the same one here
+        importMapURL: toFileUrl(resolve('./test-import-map.json')),
+      })
     ],
   })
 

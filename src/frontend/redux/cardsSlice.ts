@@ -1,17 +1,13 @@
 import {
-  ReduxToolkit,
-} from '../deps.ts'
+  createAsyncThunk,
+  createSlice,
+} from 'redux-toolkit'
 import {
   type CreateCardRequest,
   type GetCardsResponse,
   type MoveCardRequest,
 } from '../../shared/handlers/Cards.ts'
 import { type FetchStatus } from './slices.ts'
-
-const {
-  createAsyncThunk,
-  createSlice
-} = ReduxToolkit
 
 export interface CardsState {
   groupedCards: GetCardsResponse

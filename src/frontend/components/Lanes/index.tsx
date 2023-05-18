@@ -1,7 +1,12 @@
+import React from 'react'
 import {
-  React,
-  ReactRedux,
-} from '../../deps.ts'
+  useContext,
+  useEffect,
+} from 'react'
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux'
 import {
   fetchLanesAction,
   LaneSliceState,
@@ -10,20 +15,20 @@ import {
   fetchCardsAction,
   CardsSliceState,
 } from '../../redux/cardsSlice.ts'
+import {
+  DIContext,
+  LaneSymbol,
+} from '../../diSymbols.ts'
 import { LoadingNotice } from './LoadingNotice.tsx'
 import { type FetchStatus } from '../../redux/slices.ts'
 import { StoreDispatch } from '../../redux/store.ts'
 import { type Lane as LaneModel } from '../../../shared/models/Lane.ts'
 import { type GetCardsResponse } from '../../../shared/handlers/Cards.ts'
-import { Lane } from '../Lane/index.tsx'
-
-const {
-  useDispatch,
-  useSelector,
-} = ReactRedux
-const { useEffect } = React
+import { type LaneProps } from '../Lane/index.tsx'
 
 export const Lanes = () => {
+
+  const Lane = useContext(DIContext)![LaneSymbol] as React.FC<LaneProps>
 
   const dispatch = useDispatch<StoreDispatch>()
   const lanesFetchStatus = useSelector<LaneSliceState, FetchStatus>((state) => state.lanes.loadingStatus)

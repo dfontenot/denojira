@@ -1,17 +1,22 @@
+import React from 'react'
+import { useContext } from 'react'
+import { CardResponse } from '../../../shared/handlers/Cards.ts'
+import { type CardProps } from '../Card/index.tsx'
 import {
-  React,
-} from '../../deps.ts'
-import { CardResponse } from '../../../shared/models/Card.ts'
-import { Card } from '../Card/index.tsx'
+  CardSymbol,
+  DIContext,
+} from '../../diSymbols.ts'
 
-interface Props {
+export interface CardsProps {
   cardData: CardResponse[]
   laneId: number | string
 }
 
-export const Cards = ({ cardData, laneId }: Props) => {
+export const Cards = ({ cardData, laneId }: CardsProps) => {
+
+  const Card = useContext(DIContext)![CardSymbol] as React.FC<CardProps>
 
   return <div className='flex flex-col space-y-4'>
-    {cardData.map((card: CardResponse) => <Card key={card.id} id={card.id} laneId={laneId} title={card.title} description={card.description} />)}
+    {Card == null ? <></> : cardData.map((card: CardResponse) => <Card key={card.id} id={card.id} laneId={laneId} title={card.title} description={card.description} />)}
     </div>
 }

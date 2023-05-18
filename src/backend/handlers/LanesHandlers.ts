@@ -1,6 +1,4 @@
-import {
-  Oak,
-} from '../deps.ts'
+import * as Oak from 'oak'
 import { type CreateLaneRequest } from '../../shared/handlers/Lanes.ts'
 import { serializeWithBigIntQuoted } from './utils.ts'
 import { LaneRepository } from '../db/repository/LaneRepository.ts'

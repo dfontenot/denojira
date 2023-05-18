@@ -1,6 +1,4 @@
-import {
-  React,
-} from '../../deps.ts'
+import React from 'react'
 import { type FetchStatus } from '../../redux/slices.ts'
 
 interface Props {

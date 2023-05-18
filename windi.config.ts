@@ -1,7 +1,5 @@
-import {
-  WindiCSSAnimations,
-  WindiCSSForms,
-} from './src/backend/deps.ts'
+import WindiCSSAnimations from 'windicss-plugin-animations'
+import WindiCSSForms from 'windicss-plugin-forms'
 
 export const config = {
   theme: {

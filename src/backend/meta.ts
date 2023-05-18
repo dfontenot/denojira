@@ -1,11 +1,8 @@
 import {
-  Path,
-} from './deps.ts'
-const {
   basename,
   SEP,
   toFileUrl,
-} = Path
+} from 'path'
 
 const projectBasename = new URL('.', import.meta.url).pathname
 const isFileUrlString = (filename: string) => filename.startsWith('file://')

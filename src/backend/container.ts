@@ -1,11 +1,12 @@
+import { asynciter } from 'asynciter'
 import {
-  Asynciter,
-  Fs,
-  Inversify,
-  Logger,
-  Oak,
-  Postgres,
-} from './deps.ts'
+  Container,
+  type interfaces,
+} from 'inversify'
+import { walk } from 'fs'
+import * as Logger from 'logger'
+import * as Oak from 'oak'
+import * as Postgres from 'postgres'
 import {
   getDirectoryName,
   getModuleName,
@@ -35,16 +36,6 @@ import {
   getLanesHandler,
   moveCardHandler,
 } from './handlers/index.ts'
-
-const {
-  asynciter,
-} = Asynciter
-const {
-  Container,
-} = Inversify
-const {
-  walk,
-} = Fs
 
 export type OakHandler = (ctx: Oak.Context) => Promise<void>
 
@@ -89,31 +80,31 @@ export const makeContainer = () => {
   }))
   container.bind<Postgres.Pool>(DISymbols.DbConnectionPoolId).toConstantValue(pool)
   container.bind<DbClient>(DISymbols.DbClientId).to(PoolOrTxClient)
-  container.bind<Inversify.interfaces.Factory<DbClient>>(DISymbols.DbClientFromTxFactoryId)
-    .toFactory<DbClient, [Postgres.Transaction]>((_context: Inversify.interfaces.Context) =>
+  container.bind<interfaces.Factory<DbClient>>(DISymbols.DbClientFromTxFactoryId)
+    .toFactory<DbClient, [Postgres.Transaction]>((_context: interfaces.Context) =>
       (tx: Postgres.Transaction) => new PoolOrTxClient(tx))
   container.bind<LaneRepository>(DISymbols.LaneRepositoryId).to(DbLaneRepository)
-  container.bind<Inversify.interfaces.Factory<LaneRepository>>(DISymbols.LaneRepositoryFactoryId)
-    .toFactory<LaneRepository, [Postgres.Transaction]>((context: Inversify.interfaces.Context) =>
+  container.bind<interfaces.Factory<LaneRepository>>(DISymbols.LaneRepositoryFactoryId)
+    .toFactory<LaneRepository, [Postgres.Transaction]>((context: interfaces.Context) =>
       (tx: Postgres.Transaction) => new DbLaneRepository(context.container.get<(tx: Postgres.Transaction) => DbClient>(DISymbols.DbClientFromTxFactoryId)(tx)))
   container.bind<CardRepository>(DISymbols.CardRepositoryId).to(DbCardRepository)
-  container.bind<OakHandler>(DISymbols.GetCardsHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
+  container.bind<OakHandler>(DISymbols.GetCardsHandlerId).toDynamicValue((context: interfaces.Context) =>
     (ctx: Oak.Context) => getCardsHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
-  container.bind<OakHandler>(DISymbols.CreateNewCardHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
+  container.bind<OakHandler>(DISymbols.CreateNewCardHandlerId).toDynamicValue((context: interfaces.Context) =>
     (ctx: Oak.Context) => createNewCardHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
-  container.bind<OakHandler>(DISymbols.MoveCardHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
+  container.bind<OakHandler>(DISymbols.MoveCardHandlerId).toDynamicValue((context: interfaces.Context) =>
     (ctx: Oak.Context) => moveCardHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
-  container.bind<OakHandler>(DISymbols.DeleteCardHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
+  container.bind<OakHandler>(DISymbols.DeleteCardHandlerId).toDynamicValue((context: interfaces.Context) =>
     (ctx: Oak.Context) => deleteCardHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
-  container.bind<OakHandler>(DISymbols.GetLanesHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
+  container.bind<OakHandler>(DISymbols.GetLanesHandlerId).toDynamicValue((context: interfaces.Context) =>
     (ctx: Oak.Context) => getLanesHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
-  container.bind<OakHandler>(DISymbols.CreateLaneHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
+  container.bind<OakHandler>(DISymbols.CreateLaneHandlerId).toDynamicValue((context: interfaces.Context) =>
     (ctx: Oak.Context) => createNewLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
-  container.bind<OakHandler>(DISymbols.DisableLaneHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
+  container.bind<OakHandler>(DISymbols.DisableLaneHandlerId).toDynamicValue((context: interfaces.Context) =>
     (ctx: Oak.Context) => disableLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
-  container.bind<OakHandler>(DISymbols.EnableLaneHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
+  container.bind<OakHandler>(DISymbols.EnableLaneHandlerId).toDynamicValue((context: interfaces.Context) =>
     (ctx: Oak.Context) => enableLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
-  container.bind<OakHandler>(DISymbols.DeleteLaneHandlerId).toDynamicValue((context: Inversify.interfaces.Context) =>
+  container.bind<OakHandler>(DISymbols.DeleteLaneHandlerId).toDynamicValue((context: interfaces.Context) =>
     (ctx: Oak.Context) => deleteLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
 
   return container

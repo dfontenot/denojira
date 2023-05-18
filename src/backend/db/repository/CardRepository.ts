@@ -1,11 +1,11 @@
+import Dex from 'dex'
 import {
-  Dex,
-  Inversify,
-  Logger,
-  Postgres,
-  Reflect,
-} from '../../deps.ts'
-import { getModuleName, getDirectoryName } from '../../meta.ts'
+  inject,
+  injectable,
+} from 'inversify'
+import { getLogger } from 'logger'
+import * as Postgres from 'postgres'
+import { getModuleName } from '../../meta.ts'
 import { type DbClient } from '../DbClient.ts'
 import { LaneRepository } from './LaneRepository.ts'
 import { Card } from '../../../shared/models/Card.ts'
@@ -13,11 +13,6 @@ import {
   DbClientId,
   LaneRepositoryFactoryId,
 } from '../../types.ts'
-const {
-  inject,
-  injectable,
-} = Inversify
-const { getLogger } = Logger
 
 interface RawCardRow {
   id: number,

@@ -1,5 +1,5 @@
 // icon:close | Ionicons https://ionicons.com/ | Ionic Framework
-import { React } from '../../deps.ts'
+import React from 'react'
 
 function IconClose(props: React.SVGProps<SVGSVGElement>) {
   return (

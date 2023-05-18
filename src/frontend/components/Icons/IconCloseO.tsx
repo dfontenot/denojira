@@ -1,5 +1,5 @@
 // icon:close-o | CSS Icons https://css.gg/ | Astrit
-import { React } from '../../deps.ts'
+import React from 'react'
 
 function IconCloseO(props: React.SVGProps<SVGSVGElement>) {
   return (

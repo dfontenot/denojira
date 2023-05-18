@@ -1,26 +1,30 @@
+import React from 'react'
 import {
-  React,
-  ReactDnD,
-  ReactRedux,
-} from '../../deps.ts'
+  useContext,
+  useEffect,
+} from 'react'
+import { useDrag } from 'react-dnd'
+import { useDispatch } from 'react-redux'
 import { StoreDispatch } from '../../redux/store.ts'
 import { cardSym } from '../../dnd/syms.ts'
-import { IconClose } from '../Icons/index.tsx'
 import { deleteCardAction } from '../../redux/cardsSlice.ts'
+import {
+  DIContext,
+  IconCloseSymbol,
+} from '../../diSymbols.ts'
 
-const { useDrag } = ReactDnD
-const { useDispatch } = ReactRedux
-
-interface Props {
+export interface CardProps {
   id: number | string
   laneId: number | string
   title: string
   description: string
 }
 
-export const Card = ({ title, description, id, laneId }: Props) => {
+export const Card = ({ title, description, id, laneId }: CardProps) => {
 
   const dispatch = useDispatch<StoreDispatch>()
+  const IconClose = useContext(DIContext)![IconCloseSymbol] as React.FC<React.SVGProps<SVGSVGElement>>
+  let self: any
 
   const [{ isDragging }, drag] = useDrag(() => ({
     type: cardSym,
@@ -37,13 +41,14 @@ export const Card = ({ title, description, id, laneId }: Props) => {
     dispatch(deleteCardAction(id))
   }
 
+  // NOTE: an unfortunate hack to get around style= prop issues in deno dom
+  useEffect(() => self!.setAttribute('style', 'opacity: 1'), [])
+  useEffect(() => self!.setAttribute('style', `opacity: ${isDragging ? '0.5' : '1'}`), [isDragging])
+
   return (
     <article
       className='grow-0 border-1 border-solid border-slate-600 rounded-lg p-2 relative'
-      ref={drag}
-      style={{
-        opacity: isDragging ? 0.5 : 1,
-      }}>
+      ref={(elem) => { drag(elem); self = elem }}>
       <div
         className='hover:cursor-pointer'
         onClick={(e) => doDelete(e)}

@@ -1,7 +1,5 @@
-import {
-  Logger,
-  Oak,
-} from '../deps.ts'
+import * as Oak from 'oak'
+import { getLogger } from 'logger'
 import {
   CardRepository,
   type CardInLane,
@@ -14,7 +12,6 @@ import {
   MoveCardRequest,
 } from '../../shared/handlers/Cards.ts'
 import { serializeWithBigIntQuoted } from './utils.ts'
-const { getLogger } = Logger
 
 const getCardsHandler = async (cardRepository: CardRepository, ctx: Oak.Context) => {
 
