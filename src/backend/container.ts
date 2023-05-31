@@ -5,7 +5,12 @@ import {
 } from 'inversify'
 import { walk } from 'fs'
 import * as Logger from 'logger'
-import * as Oak from 'oak'
+import {
+  Application,
+  Context,
+  Middleware,
+  Router,
+} from 'oak'
 import * as Postgres from 'postgres'
 import {
   getDirectoryName,
@@ -40,7 +45,8 @@ import {
   moveCardHandler,
 } from './handlers/index.ts'
 
-export type OakHandler = (ctx: Oak.Context) => Promise<void>
+export type OakHandler = (ctx: Context) => Promise<void>
+export type OakMiddleware = Middleware<Record<string, any>, Context<Record<string, any>, Record<string, any>>>
 
 const defaultLogLevel = 'DEBUG'
 
@@ -81,37 +87,109 @@ export const makeContainer = () => {
       ...(await collectLoggerModules())
     },
   }))
+
   container.bind<Postgres.Pool>(DISymbols.DbConnectionPoolId).toConstantValue(pool)
+
   container.bind<DbClient>(DISymbols.DbClientId).to(PoolOrTxClient)
+
   container.bind<interfaces.Factory<DbClient>>(DISymbols.DbClientFromTxFactoryId)
     .toFactory<DbClient, [Postgres.Transaction]>((_context: interfaces.Context) =>
       (tx: Postgres.Transaction) => new PoolOrTxClient(tx))
+
   container.bind<LaneRepository>(DISymbols.LaneRepositoryId).to(DbLaneRepository)
+
   container.bind<interfaces.Factory<LaneRepository>>(DISymbols.LaneRepositoryFactoryId)
     .toFactory<LaneRepository, [Postgres.Transaction]>((context: interfaces.Context) =>
       (tx: Postgres.Transaction) => new DbLaneRepository(context.container.get<(tx: Postgres.Transaction) => DbClient>(DISymbols.DbClientFromTxFactoryId)(tx)))
+
   container.bind<CardRepository>(DISymbols.CardRepositoryId).to(DbCardRepository)
+
   container.bind<OakHandler>(DISymbols.GetCardsHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Oak.Context) => getCardsHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
+    (ctx: Context) => getCardsHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
+
   container.bind<OakHandler>(DISymbols.CreateNewCardHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Oak.Context) => createNewCardHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
+    (ctx: Context) => createNewCardHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
+
   container.bind<OakHandler>(DISymbols.MoveCardHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Oak.Context) => moveCardHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
+    (ctx: Context) => moveCardHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
+
   container.bind<OakHandler>(DISymbols.DeleteCardHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Oak.Context) => deleteCardHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
+    (ctx: Context) => deleteCardHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
+
   container.bind<OakHandler>(DISymbols.GetLanesHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Oak.Context) => getLanesHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+    (ctx: Context) => getLanesHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+
   container.bind<OakHandler>(DISymbols.CreateLaneHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Oak.Context) => createNewLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+    (ctx: Context) => createNewLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+
   container.bind<OakHandler>(DISymbols.DisableLaneHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Oak.Context) => disableLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+    (ctx: Context) => disableLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+
   container.bind<OakHandler>(DISymbols.EnableLaneHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Oak.Context) => enableLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+    (ctx: Context) => enableLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+
   container.bind<OakHandler>(DISymbols.DeleteLaneHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Oak.Context) => deleteLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+    (ctx: Context) => deleteLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+
   container.bind<OakHandler>(DISymbols.CSSHandlerId).toFunction(cssHandler)
+
   container.bind<OakHandler>(DISymbols.JSBundleHandlerId).toFunction(jsBundleHandler)
+
   container.bind<OakHandler>(DISymbols.AppHandlerId).toFunction(appHandler)
+
+  container.bind<Router>(DISymbols.RouterId).toDynamicValue((context: interfaces.Context) => {
+    const router = new Router()
+
+    router.get('/', context.container.get<OakHandler>(DISymbols.AppHandlerId))
+
+    router.get('/static/app.css', context.container.get<OakHandler>(DISymbols.CSSHandlerId))
+    router.get('/static/app.js', context.container.get<OakHandler>(DISymbols.JSBundleHandlerId))
+
+    router.get('/api/lanes', context.container.get<OakHandler>(DISymbols.GetLanesHandlerId))
+    router.put('/api/lane/:laneId/disable', context.container.get<OakHandler>(DISymbols.DisableLaneHandlerId))
+    router.put('/api/lane/:laneId/enable', context.container.get<OakHandler>(DISymbols.EnableLaneHandlerId))
+    router.post('/api/lane', context.container.get<OakHandler>(DISymbols.CreateLaneHandlerId))
+    router.delete('/api/lane/:laneId', context.container.get<OakHandler>(DISymbols.DeleteLaneHandlerId))
+
+    router.get('/api/cards', context.container.get<OakHandler>(DISymbols.GetCardsHandlerId))
+    router.post('/api/card', context.container.get<OakHandler>(DISymbols.CreateNewCardHandlerId))
+    router.put('/api/card/lane', context.container.get<OakHandler>(DISymbols.MoveCardHandlerId))
+    router.delete('/api/card/:cardId', context.container.get<OakHandler>(DISymbols.DeleteCardHandlerId))
+
+    return router
+  })
+
+  container.bind<OakMiddleware[]>(DISymbols.ApplicationMiddlewareId).toConstantValue([
+    async (ctx, next) => {
+      await next()
+      const rt = ctx.response.headers.get('X-Response-Time')
+      console.log(`${ctx.request.method} ${ctx.request.url} - ${rt}`)
+    },
+    async (ctx, next) => {
+      const start = Date.now()
+      await next()
+      const ms = Date.now() - start
+      ctx.response.headers.set('X-Response-Time', `${ms}ms`)
+    },
+  ])
+
+  container.bind<Application>(DISymbols.ApplicationId).toDynamicValue((context: interfaces.Context) => {
+    const app = new Application()
+
+    const router = context.container.get<Router>(DISymbols.RouterId)
+    const middleware = context.container.get<OakMiddleware[]>(DISymbols.ApplicationMiddlewareId)
+
+    middleware.forEach((middleware) => app.use(middleware)) // TODO: use apply()
+
+    app.addEventListener('listen', () => {
+      console.log('Listening on http://localhost:8000');
+    })
+
+    app.use(router.routes())
+    app.use(router.allowedMethods())
+
+    return app
+  })
 
   return container
 }
