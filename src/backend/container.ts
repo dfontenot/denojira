@@ -26,6 +26,7 @@ import {
   PoolOrTxClient,
 } from './db/DbClient.ts'
 import {
+  appHandler,
   createNewCardHandler,
   createNewLaneHandler,
   cssHandler,
@@ -110,6 +111,7 @@ export const makeContainer = () => {
     (ctx: Oak.Context) => deleteLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
   container.bind<OakHandler>(DISymbols.CSSHandlerId).toFunction(cssHandler)
   container.bind<OakHandler>(DISymbols.JSBundleHandlerId).toFunction(jsBundleHandler)
+  container.bind<OakHandler>(DISymbols.AppHandlerId).toFunction(appHandler)
 
   return container
 }

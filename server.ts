@@ -4,14 +4,10 @@ import {
   setup as loggerSetup,
   LogConfig,
 } from 'logger'
-import * as Mustache from 'mustache'
-import React from 'react'
-import { renderToString } from 'react-dom-server'
 import {
   Application,
   Router,
 } from 'oak'
-import { App } from './src/frontend/App.tsx'
 import {
   makeContainer,
   type OakHandler,
@@ -26,13 +22,7 @@ loggerSetup(await container.getAsync<LogConfig>(DISymbols.LoggerConfigId))
 const app = new Application()
 const router = new Router()
 
-router.get('/', async (ctx) => {
-  const reactSSRApp = renderToString(<App />)
-  const content = await Mustache.renderFile('./public/index.html.mustache', { reactApp: reactSSRApp })
-  ctx.response.headers.set('Content-Type', 'text/html')
-
-  ctx.response.body = content
-})
+router.get('/', container.get<OakHandler>(DISymbols.AppHandlerId))
 
 router.get('/static/app.css', container.get<OakHandler>(DISymbols.CSSHandlerId))
 router.get('/static/app.js', container.get<OakHandler>(DISymbols.JSBundleHandlerId))
