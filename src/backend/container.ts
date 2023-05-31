@@ -28,6 +28,7 @@ import {
 import {
   createNewCardHandler,
   createNewLaneHandler,
+  cssHandler,
   deleteCardHandler,
   deleteLaneHandler,
   disableLaneHandler,
@@ -106,6 +107,7 @@ export const makeContainer = () => {
     (ctx: Oak.Context) => enableLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
   container.bind<OakHandler>(DISymbols.DeleteLaneHandlerId).toDynamicValue((context: interfaces.Context) =>
     (ctx: Oak.Context) => deleteLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+  container.bind<OakHandler>(DISymbols.CSSHandlerId).toFunction(cssHandler)
 
   return container
 }

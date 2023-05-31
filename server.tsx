@@ -1,22 +1,16 @@
 import { Reflect } from 'reflect'
 Reflect.getMetadata('foo', {}) // dummy call to keep reflect imported
-import { asynciter } from 'asynciter'
 import * as ESBuild from 'esbuild'
 import * as ESBuildDenoLoader from 'esbuild-deno-loader'
-import { walk } from 'fs'
 import {
-  getLogger,
   setup as loggerSetup,
   LogConfig,
 } from 'logger'
 import * as Mustache from 'mustache'
 import {
-  join,
   resolve,
   toFileUrl,
 } from 'path'
-import { Processor } from 'windicss-lib'
-import { HTMLParser } from 'windicss-parser'
 import React from 'react'
 import { renderToString } from 'react-dom-server'
 import {
@@ -28,9 +22,7 @@ import {
   makeContainer,
   type OakHandler,
 } from './src/backend/container.ts'
-import { getDirectoryName } from './src/backend/meta.ts'
 import * as DISymbols from './src/backend/types.ts'
-import { config as windiConfig } from './windi.config.ts'
 
 const container = makeContainer()
 
@@ -48,39 +40,7 @@ router.get('/', async (ctx) => {
   ctx.response.body = content
 })
 
-// router.get('/old/static/app.js', async (ctx) => {
-//   // NOTE: choosing to manually bundle each time in dev for reloadability TODO: caching settings
-//   // TODO: bundle is really slow, ~2 seconds locally, will probably need a new solution
-//   const appUrl = Path.toFileUrl(Path.resolve('./src/frontend/App.tsx'))
-//   const { code } = await DenoEmit.bundle(appUrl)
-//
-//   ctx.response.headers.set('Content-Type', 'text/javascript')
-//   ctx.response.body = code
-// })
-
-router.get('/static/app.css', async (ctx) => {
-
-  const logger = getLogger('server')
-
-  // TODO: also include public html directory in the css utility scan
-
-  // NOTE: assumes that all mentions of stylesheets in code occur in App.tsx or a components
-  const backendDirectoryBasename = join(getDirectoryName(import.meta.url), 'src', 'frontend')
-  const tsxText = await asynciter(walk(backendDirectoryBasename, { includeDirs: false, exts: ['.tsx'], match: [/components/, /App/] }))
-    .concurrentUnorderedMap(async (entry) => { logger.debug(`reading file for windicss ${entry.path}`); return await Deno.readTextFile(entry.path) })
-    .reduce('', (acc, item) => acc + item)
-
-  const processor = new Processor(windiConfig)
-  const htmlClasses = new HTMLParser(tsxText).parseClasses().map((i) => i.result).join(' ')
-  logger.debug(`encountered CSS classes ${htmlClasses}`)
-  const preflight = processor.preflight(tsxText)
-
-  const interpreted = processor.interpret(htmlClasses).styleSheet
-  const styles = interpreted.extend(preflight, false).build(false)
-
-  ctx.response.headers.set('Content-Type', 'text/css')
-  ctx.response.body = styles
-})
+router.get('/static/app.css', container.get<OakHandler>(DISymbols.CSSHandlerId))
 
 router.get('/static/app.js', async (ctx) => {
 
