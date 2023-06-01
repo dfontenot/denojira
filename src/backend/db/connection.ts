@@ -7,8 +7,8 @@ const dbConnectionSettings = {
   database: 'denojira',
 }
 
-export const client = new Postgres.Client(dbConnectionSettings)
+export const makeClient = () => new Postgres.Client(dbConnectionSettings)
 
 const POOL_SIZE = 10
 
-export const pool = new Postgres.Pool(dbConnectionSettings, POOL_SIZE, true)
+export const makePool = () => new Postgres.Pool(dbConnectionSettings, POOL_SIZE, true)

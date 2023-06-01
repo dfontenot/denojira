@@ -16,7 +16,7 @@ import {
   getDirectoryName,
   getModuleName,
 } from './meta.ts'
-import { pool } from './db/connection.ts'
+import { makePool } from './db/connection.ts'
 import * as DISymbols from './types.ts'
 import {
   DbLaneRepository,
@@ -88,7 +88,7 @@ export const makeContainer = () => {
     },
   }))
 
-  container.bind<Postgres.Pool>(DISymbols.DbConnectionPoolId).toConstantValue(pool)
+  container.bind<Postgres.Pool>(DISymbols.DbConnectionPoolId).toDynamicValue((_context: interfaces.Context) => makePool()).inSingletonScope()
 
   container.bind<DbClient>(DISymbols.DbClientId).to(PoolOrTxClient)
 
