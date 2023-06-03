@@ -10,7 +10,10 @@ import { expect } from 'chai'
 import { Application } from 'oak'
 import * as sinon from 'sinon'
 import { superoak } from 'superoak'
-import { type CreateCardRequest } from '../../../src/shared/handlers/Cards.ts'
+import {
+  type CreateCardRequest,
+  type MoveCardRequest,
+} from '../../../src/shared/handlers/Cards.ts'
 import { type Card } from '../../../src/shared/models/index.ts'
 import { makeContainer } from '../../../src/backend/container.ts'
 import * as DISymbols from '../../../src/backend/types.ts'
@@ -34,20 +37,20 @@ const anyCard: Card = {
   updatedAt: new Date(),
 }
 const container = makeContainer()
-const stubCardRepo = sinon.createStubInstance(DbCardRepository, {
-  // TODO: utility type this, very brittle
-  createCard: sinon.stub<[title: string, description: string, laneId: string | number], Promise<Card>>().resolves(anyCard),
-  deleteCard: sinon.stub<[cardId: number | string], Promise<boolean>>(),
-})
+const stubCardRepo = sinon.createStubInstance(DbCardRepository)
 
 describe('CardHandlers', () => {
   beforeAll(() => {
     container.rebind<CardRepository>(DISymbols.CardRepositoryId).toConstantValue(stubCardRepo)
+
+    stubCardRepo.createCard.resolves(anyCard)
   })
 
   afterEach(() => {
     stubCardRepo.createCard.resetHistory()
     stubCardRepo.deleteCard.resetHistory()
+    stubCardRepo.moveCard.resetHistory()
+    stubCardRepo.getAllCardsInLanes.resetHistory()
   })
 
   it('should create a card', async () => {
@@ -62,12 +65,33 @@ describe('CardHandlers', () => {
     expect(stubCardRepo.createCard.called).to.be.true
   })
 
+  it('should move a card', async () => {
+    const newLane = anyCard.laneId + 1
+    const movedCard = { ...anyCard }
+    movedCard.laneId = newLane
+    const moveRequest: MoveCardRequest = {
+      cardId: anyCard.id,
+      destinationLaneId: newLane,
+    }
+
+    stubCardRepo.moveCard.resolves(movedCard)
+    const app = await superoak(container.get<Application>(DISymbols.ApplicationId))
+    await app.put('/api/card/lane')
+      .set('content-type', 'application/json')
+      .send(JSON.stringify(moveRequest))
+      .expect(200)
+
+    expect(stubCardRepo.moveCard.calledOnceWith(moveRequest.cardId, moveRequest.destinationLaneId)).to.be.true
+  })
+
   describe('delete', () => {
     const anyCardId = 3
 
     afterEach(() => {
       stubCardRepo.createCard.resetHistory()
       stubCardRepo.deleteCard.resetHistory()
+      stubCardRepo.moveCard.resetHistory()
+      stubCardRepo.getAllCardsInLanes.resetHistory()
     })
 
     it('404 if deletion is false', async () => {
@@ -77,7 +101,7 @@ describe('CardHandlers', () => {
       await app.delete(`/api/card/${anyCardId}`)
         .expect(404)
 
-      expect(stubCardRepo.deleteCard.calledOnceWith(anyCardId))
+      expect(stubCardRepo.deleteCard.calledOnceWith(`${anyCardId}`)).to.be.true
     })
 
     it('happy path', async () => {
@@ -87,7 +111,7 @@ describe('CardHandlers', () => {
       await app.delete(`/api/card/${anyCardId}`)
         .expect(200)
 
-      expect(stubCardRepo.deleteCard.calledOnceWith(anyCardId))
+      expect(stubCardRepo.deleteCard.calledOnceWith(`${anyCardId}`)).to.be.true
     })
   })
 })
