@@ -19,7 +19,6 @@ const getCardsHandler = async (cardRepository: CardRepository, ctx: Oak.Context)
   logger.debug('loading all cards')
   const joinedResults = await cardRepository.getAllCardsInLanes()
 
-  // TODO: clean up typing errors
   const grouped = joinedResults.reduce<GetCardsResponse>((acc: GetCardsResponse, row: CardInLane) => {
     const key = `${row.laneId}`
     const newCard: CardResponse = { id: row.cardId, title: row.title, description: row.description }
