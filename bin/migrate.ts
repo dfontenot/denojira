@@ -3,8 +3,10 @@
 import {
   cardsCreateTableQuery,
   lanesCreateTableQuery,
-} from '../src/db/schema.ts'
-import { client } from '../src/db/connection.ts'
+} from '../src/backend/db/schema.ts'
+import { makeClient } from '../src/backend/db/connection.ts'
+
+const client = makeClient()
 
 (async() => {
   console.log(`will run ${lanesCreateTableQuery.toString()}`)
