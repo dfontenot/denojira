@@ -18,11 +18,13 @@ import { type Card } from '../../../src/shared/models/index.ts'
 import { makeContainer } from '../../../src/backend/container.ts'
 import * as DISymbols from '../../../src/backend/types.ts'
 import {
+  type CardInLane,
   type CardRepository,
   DbCardRepository,
 } from '../../../src/backend/db/repository/CardRepository.ts'
 
 const anyLaneId = 1
+const anyLaneName = 'foo'
 const anyCreateCardRequest: CreateCardRequest = {
   title: 'foo',
   description: 'bar',
@@ -63,6 +65,27 @@ describe('CardHandlers', () => {
     app.unsubscribe
 
     expect(stubCardRepo.createCard.called).to.be.true
+  })
+
+  it('should get all cards', async () => {
+
+    const anyResult: CardInLane = {
+      cardId: anyCard.id,
+      title: anyCard.title,
+      description: anyCard.description,
+      cardCreatedAt: anyCard.createdAt,
+      cardUpdatedAt: anyCard.updatedAt,
+      laneId: anyLaneId,
+      laneName: anyLaneName,
+    }
+    const anyResults = [anyResult]
+    stubCardRepo.getAllCardsInLanes.resolves(anyResults)
+
+    const app = await superoak(container.get<Application>(DISymbols.ApplicationId))
+    await app.get('/api/cards')
+      .expect(200)
+
+    expect(stubCardRepo.getAllCardsInLanes.calledOnce).to.be.true
   })
 
   it('should move a card', async () => {
