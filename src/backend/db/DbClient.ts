@@ -3,7 +3,12 @@ import {
   inject,
   injectable,
 } from 'inversify'
+import {
+  getLogger,
+  Logger,
+} from 'logger'
 import { DbConnectionPoolId } from '../types.ts'
+import { getModuleName } from '../meta.ts'
 
 export type PoolOrTx = Postgres.Pool | Postgres.Transaction
 export type PoolClientOrTx = Postgres.PoolClient | Postgres.Transaction
@@ -16,9 +21,13 @@ export interface DbClient {
 
 @injectable()
 export class PoolOrTxClient implements DbClient {
+  private logger: Logger
+
   constructor(
     @inject(DbConnectionPoolId) private pool: PoolOrTx,
-  ) {}
+  ) {
+    this.logger = getLogger(getModuleName(import.meta.url))
+  }
 
   async queryWithPool<T>(cb: (client: Postgres.PoolClient) => Promise<T>): Promise<T> {
 
@@ -28,6 +37,10 @@ export class PoolOrTxClient implements DbClient {
     try {
       client = await pool.connect()
       return await cb(client)
+    }
+    catch (e) {
+      this.logger.error('caught SQL error', e)
+      throw e
     }
     finally {
       client?.release()
@@ -45,7 +58,7 @@ export class PoolOrTxClient implements DbClient {
         return await cb(tx)
       }
       catch (e) {
-        console.log(`failed to run query inside transaction ${tx.name}`, e)
+        this.logger.error(`failed to run query inside transaction ${tx.name}`, e)
         throw e
       }
     }
@@ -71,7 +84,7 @@ export class PoolOrTxClient implements DbClient {
       }
       catch (e) {
         const message = `failed to execute (transaction name is ${tx?.name || '(no active tx)'}`
-        console.log(message, e)
+        this.logger.error(message, e)
         tx?.rollback()
         throw Error(message, e)
       }
