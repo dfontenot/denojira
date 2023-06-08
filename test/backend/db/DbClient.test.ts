@@ -8,6 +8,11 @@ import {
   it,
 } from 'bdd'
 import { expect } from 'chai'
+import {
+  resolvesNext,
+  stub,
+  type Stub,
+} from 'mock'
 import * as Postgres from 'postgres'
 import * as sinon from 'sinon'
 import { makeContainer } from '../../../src/backend/container.ts'
@@ -30,6 +35,11 @@ interface QueryObjectResponse {
 }
 
 describe('DbClient', () => {
+  const anyCallbackReturnValue = 'foo'
+  const anyQueryResult: QueryObjectResponse = {
+    rows: [{ foo: anyCallbackReturnValue }],
+  }
+
   const beforeEach_ = () => { stubPool.connect.resolves(stubPoolClient) }
   const afterEach_ = () => {
     stubPool.connect.resetHistory()
@@ -45,11 +55,6 @@ describe('DbClient', () => {
     afterEach(afterEach_)
 
     it('should run the callback on success', async () => {
-      const anyCallbackReturnValue = 'foo'
-      const anyQueryResult: QueryObjectResponse = {
-        rows: [{ foo: anyCallbackReturnValue }],
-      }
-
       stubPoolClient.queryObject.resolves(anyQueryResult as any)
 
       const anyCallback = async (client: Postgres.PoolClient) => await client.queryObject('select count(1) from any_table') as QueryObjectResponse
@@ -69,14 +74,34 @@ describe('DbClient', () => {
       const client = container.get<DbClient>(DISymbols.DbClientId)
 
       try {
-        await client.queryWithPool<void>((_foo) => Promise.resolve())
+        await client.queryWithPool(Promise.resolve)
         expect.fail('should have thrown')
       }
       catch (e) {
         expect(e.message).to.contain(anyException.message)
       }
+    })
+  })
 
-      //expect(async () => { await client.queryWithPool<void>((_foo) => Promise.resolve()) }).to.throw(anyException.message)
+  describe('queryWithClient', () => {
+    let client: DbClient
+    let queryWithPoolStub: Stub<DbClient>
+
+    beforeEach(() => {
+      beforeEach_()
+      client = container.get<DbClient>(DISymbols.DbClientId)
+      queryWithPoolStub = stub(client, 'queryWithPool', resolvesNext([anyQueryResult]))
+    })
+
+    afterEach(() => {
+      afterEach_()
+      queryWithPoolStub.restore()
+    })
+
+    it('should delegate if not a transaction', async () => {
+      const result = await client.queryWithClient(Promise.resolve)
+
+      expect(result).to.deep.equal(anyQueryResult)
     })
   })
 })
