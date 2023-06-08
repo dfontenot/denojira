@@ -30,34 +30,53 @@ interface QueryObjectResponse {
 }
 
 describe('DbClient', () => {
+  const beforeEach_ = () => { stubPool.connect.resolves(stubPoolClient) }
+  const afterEach_ = () => {
+    stubPool.connect.resetHistory()
+    stubPoolClient.queryObject.resetHistory()
+  }
+
   beforeAll(() => {
     container.rebind<PoolOrTx>(DISymbols.DbConnectionPoolId).toConstantValue(stubPool)
   })
 
-  beforeEach(() => {
-    stubPool.connect.resolves(stubPoolClient)
-  })
+  describe('queryWithPool', () => {
+    beforeEach(beforeEach_)
+    afterEach(afterEach_)
 
-  afterEach(() => {
-    stubPool.connect.resetHistory()
-    stubPoolClient.queryObject.resetHistory()
-  })
+    it('should run the callback on success', async () => {
+      const anyCallbackReturnValue = 'foo'
+      const anyQueryResult: QueryObjectResponse = {
+        rows: [{ foo: anyCallbackReturnValue }],
+      }
 
-  it('should run the callback on query success', async () => {
-    const anyCallbackReturnValue = 'foo'
-    const anyQueryResult: QueryObjectResponse = {
-      rows: [{ foo: anyCallbackReturnValue }],
-    }
+      stubPoolClient.queryObject.resolves(anyQueryResult as any)
 
-    stubPoolClient.queryObject.resolves(anyQueryResult as any)
+      const anyCallback = async (client: Postgres.PoolClient) => await client.queryObject('select count(1) from any_table') as QueryObjectResponse
 
-    const anyCallback = async (client: Postgres.PoolClient) => await client.queryObject('select count(1) from any_table') as QueryObjectResponse
+      const client = container.get<DbClient>(DISymbols.DbClientId)
 
-    const client = container.get<DbClient>(DISymbols.DbClientId)
+      const result = await client.queryWithPool<QueryObjectResponse>(anyCallback)
 
-    const result = await client.queryWithPool<QueryObjectResponse>(anyCallback)
+      expect(result.rows).to.have.lengthOf(1)
+      expect(result.rows[0].foo).to.equal(anyCallbackReturnValue)
+    })
 
-    expect(result.rows).to.have.lengthOf(1)
-    expect(result.rows[0].foo).to.equal(anyCallbackReturnValue)
+    it('should throw on failure', async () => {
+      const anyException = new Error('some failure')
+
+      stubPool.connect.throws(anyException)
+      const client = container.get<DbClient>(DISymbols.DbClientId)
+
+      try {
+        await client.queryWithPool<void>((_foo) => Promise.resolve())
+        expect.fail('should have thrown')
+      }
+      catch (e) {
+        expect(e.message).to.contain(anyException.message)
+      }
+
+      //expect(async () => { await client.queryWithPool<void>((_foo) => Promise.resolve()) }).to.throw(anyException.message)
+    })
   })
 })
