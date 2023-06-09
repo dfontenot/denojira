@@ -30,6 +30,8 @@ const stubPool = sinon.createStubInstance(Postgres.Pool)
 const stubPoolClient = sinon.createStubInstance(Postgres.PoolClient)
 const stubTransaction = sinon.createStubInstance(Postgres.Transaction)
 
+const bindClientToPool = () => container.rebind<PoolOrTx>(DISymbols.DbConnectionPoolId).toConstantValue(stubPool)
+
 interface AnyQueryResult {
   foo: string
 }
@@ -45,14 +47,19 @@ describe('DbClient', () => {
   }
   const anyCallback = async (client: PoolClientOrTx) => await client.queryObject('select count(1) from any_table') as QueryObjectResponse
 
-  const beforeEach_ = () => { stubPool.connect.resolves(stubPoolClient) }
+  const beforeEach_ = () => {
+    stubPool.connect.resolves(stubPoolClient)
+    stubPoolClient.createTransaction.returns(stubTransaction)
+  }
+
   const afterEach_ = () => {
     stubPool.connect.resetHistory()
     stubPoolClient.queryObject.resetHistory()
+    stubPoolClient.createTransaction.resetHistory()
   }
 
   beforeAll(() => {
-    container.rebind<PoolOrTx>(DISymbols.DbConnectionPoolId).toConstantValue(stubPool)
+    bindClientToPool()
   })
 
   describe('queryWithPool', () => {
@@ -114,9 +121,13 @@ describe('DbClient', () => {
         container.rebind<PoolOrTx>(DISymbols.DbConnectionPoolId).toConstantValue(stubTransaction)
       })
 
+      beforeEach(beforeEach_)
+
       afterAll(() => {
         container.rebind<PoolOrTx>(DISymbols.DbConnectionPoolId).toConstantValue(stubPool)
       })
+
+      afterEach(afterEach_)
 
       it('should run the transaction', async () => {
         stubTransaction.queryObject.resolves(anyQueryResult as any)
@@ -137,6 +148,60 @@ describe('DbClient', () => {
         catch (e) {
           expect(e.message).to.contain(anyError.message)
         }
+      })
+    })
+
+    describe('withTransaction', () => {
+      const anyTransactionName = 'foo'
+      const anyTransactionOptions: Postgres.TransactionOptions = {}
+      let client: DbClient
+
+      beforeEach(() => {
+        beforeEach_()
+        client = container.get<DbClient>(DISymbols.DbClientId)
+      })
+
+      afterEach(() => {
+        afterEach_()
+        bindClientToPool()
+      })
+
+      it('should not nest transactions', async () => {
+        container.rebind<Postgres.Transaction>(DISymbols.DbConnectionPoolId).toConstantValue(stubTransaction)
+        client = container.get<DbClient>(DISymbols.DbClientId)
+
+        try {
+          await client.withTransaction(anyTransactionName, anyTransactionOptions, Promise.resolve)
+          expect.fail('should have thrown')
+        }
+        catch (e) {
+          expect(e.message).to.match(/transaction/i)
+        }
+      })
+
+      it('should throw on failure', async () => {
+        const anyException = new Error('some failure')
+
+        stubPool.connect.throws(anyException)
+        const client = container.get<DbClient>(DISymbols.DbClientId)
+
+        try {
+          await client.withTransaction(anyTransactionName, anyTransactionOptions, Promise.resolve)
+          expect.fail('should have thrown')
+        }
+        catch (e) {
+          expect(e.message).to.match(/failed/i)
+          expect(e.cause.message).to.contain(anyException.message)
+        }
+      })
+
+      it('should run the transaction', async () => {
+        stubTransaction.queryObject.resolves(anyQueryResult as any)
+
+        const result = await client.withTransaction<QueryObjectResponse>(anyTransactionName, anyTransactionOptions, anyCallback)
+
+        expect(result.rows).to.have.lengthOf(1)
+        expect(result.rows[0].foo).to.equal(anyCallbackReturnValue)
       })
     })
   })

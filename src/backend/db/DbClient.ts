@@ -86,7 +86,7 @@ export class PoolOrTxClient implements DbClient {
         const message = `failed to execute (transaction name is ${tx?.name || '(no active tx)'}`
         this.logger.error(message, e)
         tx?.rollback()
-        throw Error(message, e)
+        throw Error(message, { cause: e })
       }
       finally {
         client?.release()
