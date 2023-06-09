@@ -68,7 +68,7 @@ export class PoolOrTxClient implements DbClient {
 
     if (this.pool instanceof Postgres.Transaction) {
       const message = `attempting to start new transaction while inside transaction ${(this.pool as Postgres.Transaction).name}`
-      console.log(message)
+      this.logger.error(message)
       throw Error(message)
     }
     else {

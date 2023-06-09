@@ -1,6 +1,7 @@
 import { Reflect } from 'reflect'
 Reflect.getMetadata('foo', {}) // dummy call to keep reflect imported
 import {
+afterAll,
   afterEach,
   beforeAll,
   beforeEach,
@@ -9,6 +10,7 @@ import {
 } from 'bdd'
 import { expect } from 'chai'
 import {
+  assertSpyCallAsync,
   resolvesNext,
   stub,
   type Stub,
@@ -20,11 +22,13 @@ import * as DISymbols from '../../../src/backend/types.ts'
 import {
   DbClient,
   PoolOrTx,
+  PoolClientOrTx,
 } from '../../../src/backend/db/DbClient.ts'
 
 const container = makeContainer()
 const stubPool = sinon.createStubInstance(Postgres.Pool)
 const stubPoolClient = sinon.createStubInstance(Postgres.PoolClient)
+const stubTransaction = sinon.createStubInstance(Postgres.Transaction)
 
 interface AnyQueryResult {
   foo: string
@@ -39,6 +43,7 @@ describe('DbClient', () => {
   const anyQueryResult: QueryObjectResponse = {
     rows: [{ foo: anyCallbackReturnValue }],
   }
+  const anyCallback = async (client: PoolClientOrTx) => await client.queryObject('select count(1) from any_table') as QueryObjectResponse
 
   const beforeEach_ = () => { stubPool.connect.resolves(stubPoolClient) }
   const afterEach_ = () => {
@@ -56,8 +61,6 @@ describe('DbClient', () => {
 
     it('should run the callback on success', async () => {
       stubPoolClient.queryObject.resolves(anyQueryResult as any)
-
-      const anyCallback = async (client: Postgres.PoolClient) => await client.queryObject('select count(1) from any_table') as QueryObjectResponse
 
       const client = container.get<DbClient>(DISymbols.DbClientId)
 
@@ -102,6 +105,39 @@ describe('DbClient', () => {
       const result = await client.queryWithClient(Promise.resolve)
 
       expect(result).to.deep.equal(anyQueryResult)
+      assertSpyCallAsync(queryWithPoolStub, 0, { args: [Promise.resolve] })
+    })
+
+    describe('queryWithClient on transaction', () => {
+
+      beforeAll(() => {
+        container.rebind<PoolOrTx>(DISymbols.DbConnectionPoolId).toConstantValue(stubTransaction)
+      })
+
+      afterAll(() => {
+        container.rebind<PoolOrTx>(DISymbols.DbConnectionPoolId).toConstantValue(stubPool)
+      })
+
+      it('should run the transaction', async () => {
+        stubTransaction.queryObject.resolves(anyQueryResult as any)
+
+        const result = await client.queryWithClient<QueryObjectResponse>(anyCallback)
+
+        expect(result.rows).to.have.lengthOf(1)
+        expect(result.rows[0].foo).to.equal(anyCallbackReturnValue)
+      })
+
+      it('should capture callback errors', async () => {
+        const anyError = new Error('a failure')
+
+        try {
+          await client.queryWithClient<void>((_client => Promise.reject(anyError)))
+          expect.fail('should have thrown')
+        }
+        catch (e) {
+          expect(e.message).to.contain(anyError.message)
+        }
+      })
     })
   })
 })
