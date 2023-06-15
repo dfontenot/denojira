@@ -19,7 +19,17 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: ${{ matrix.deno-version }}
-      # - name: Lint Deno Module
-      #   run: deno fmt --check
       - name: Run tests
-        run: ./test.sh
+        run: |
+          ./test.sh --coverage=coverage
+          deno coverage coverage --lcov --output=coverage.lcov
+          deno install -A --no-check -n code-coverage https://deno.land/x/code_coverage/cli.ts
+          deno install --allow-read --allow-write https://deno.land/x/lcov_cobertura/mod.ts
+          code-coverage --file coverage.lcov
+          lcov_cobertura coverage.lcov -o coverage.xml
+      - name: Code Coverage Summary
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: coverage.xml
+          badge: true
+          fail_below_min: false
