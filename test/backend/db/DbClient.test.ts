@@ -1,5 +1,4 @@
-import { Reflect } from 'reflect'
-Reflect.getMetadata('foo', {}) // dummy call to keep reflect imported
+import '../../../src/backend/reflect.ts'
 import {
 afterAll,
   afterEach,
