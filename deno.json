@@ -48,5 +48,6 @@
     "windicss-parser": "https://esm.sh/windicss@3.5/utils/parser",
     "windicss-plugin-animations": "https://esm.sh/@windicss/plugin-animations",
     "windicss-plugin-forms": "https://esm.sh/windicss@3.5/plugin/forms"
-  }
+  },
+  "importMap": "./vendor/import_map.json"
 }
