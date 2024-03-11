@@ -2,6 +2,8 @@
 
 A Jira clone. This project is an experiment to see what is involved with porting a legacy framework-less React application to the Deno runtime instead of Node.JS.
 
+![a screenshot demo of the website](./demo.png "website demo with a few cards")
+
 ## Stack
 Uses
 
