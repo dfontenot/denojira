@@ -18,14 +18,20 @@ services:
       - "8000:8000"
     environment:
       DB_PASSWORD: password
+    # NOTE: hot-reload not implemented
+    volumes:
+      - ./:/app
   migration_task:
     depends_on:
       - db
     build:
       context: .
-    command: -c 'deno run --allow-net --allow-read --allow-env bin/migrate.ts'
+    # TODO: busybox env binary does not like the shebang
+    command: -c '/app/bin/migrate.ts'
     environment:
       DB_PASSWORD: password
+    volumes:
+      - ./:/app
 volumes:
   pgdata:
     driver: local
