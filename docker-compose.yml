@@ -10,10 +10,20 @@ services:
     volumes:
       - "pgdata:/var/lib/postgresql/data:Z"
   server:
+    depends_on:
+      - db
     build:
       context: .
     ports:
       - "8000:8000"
+    environment:
+      DB_PASSWORD: password
+  migration_task:
+    depends_on:
+      - db
+    build:
+      context: .
+    command: -c 'deno run --allow-net --allow-read --allow-env bin/migrate.ts'
     environment:
       DB_PASSWORD: password
 volumes:
