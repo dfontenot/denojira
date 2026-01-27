@@ -1,4 +1,4 @@
-version: '3.1'
+version: "3.1"
 
 services:
   db:
@@ -11,6 +11,11 @@ services:
       POSTGRES_DB: denojira
     volumes:
       - "pgdata:/var/lib/postgresql/data:Z"
+  server:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
 volumes:
   pgdata:
     driver: local
