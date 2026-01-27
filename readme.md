@@ -5,15 +5,19 @@ A Jira clone. This project is an experiment to see what is involved with porting
 ![a screenshot demo of the website](./demo.png "website demo with a few cards")
 
 ## Stack
+
 Uses
 
-* [Deno](https://deno.land)
-* [Deno postgresql driver](https://deno-postgres.com/#/)
-* [Esbuild](https://esbuild.github.io/)
-* [Oak](https://oakserver.github.io/oak/) (similar to Koa)
-* React (SSR)
-* [WindiCSS](https://windicss.org/)
+- [Deno](https://deno.land)
+- [Deno postgresql driver](https://deno-postgres.com/#/)
+- [Esbuild](https://esbuild.github.io/)
+- [Oak](https://oakserver.github.io/oak/) (similar to Koa)
+- React (SSR)
+- [WindiCSS](https://windicss.org/)
 
+## Run it
+
+`docker compose up --build` or without Docker `./run.sh` then navigate to https://localhost:8000
 
 ## Development
 
@@ -28,7 +32,9 @@ At the moment, the server is set up around supporting a dev setup where most ass
 ## Ops
 
 ### Create a swim lane
-`curl -X POST -H "Content-Type:application/json" http://localhost:8000/api/lane -d '{"name":"test lane"}'`
+
+`curl -X POST -H "Content-Type:application/json" http://localhost:8000/api/lane -d '{"name":"test lane", "precedence": 10}'`
 
 ### Get the current swim lanes
+
 `curl http://localhost:8000/api/lanes`
