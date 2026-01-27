@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: denojira
     volumes:
-      - "pgdata:/var/lib/postgresql/data:Z"
+      - "pgdata:/var/lib/postgresql/data"
   server:
     depends_on:
       - db
