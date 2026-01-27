@@ -1,10 +1,10 @@
 import * as Postgres from 'postgres'
 
 const dbConnectionSettings = {
-  hostname: 'localhost',
-  user: 'postgres',
-  password: 'password',
-  database: 'denojira',
+  hostname: Deno.env.get('DB_HOST') || 'localhost',
+  user: Deno.env.get('DB_USER') || 'postgres',
+  password: Deno.env.get('DB_PASSWORD'),
+  database: Deno.env.get('DB_DATABASE') || 'denojira',
 }
 
 export const makeClient = () => new Postgres.Client(dbConnectionSettings)
