@@ -26,7 +26,6 @@ services:
       - db
     build:
       context: .
-    # TODO: busybox env binary does not like the shebang
     command: -c '/app/bin/migrate.ts'
     environment:
       DB_PASSWORD: password
