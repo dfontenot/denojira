@@ -1,10 +1,13 @@
 import { Context } from 'oak'
 import * as ESBuild from 'esbuild'
 import * as ESBuildDenoLoader from 'esbuild-deno-loader'
-import {
-  resolve,
-  toFileUrl,
-} from 'path'
+import { resolve, toFileUrl } from 'path'
+
+const denoPluginSettings = () => {
+  return {
+    importMapURL: toFileUrl(resolve(Deno.mainModule == 'test' ? './test-import-map.json' : './vendor/import_map.json')),
+  }
+}
 
 export const jsBundleHandler = async (ctx: Context) => {
   const built = await ESBuild.build({
@@ -19,10 +22,7 @@ export const jsBundleHandler = async (ctx: Context) => {
     bundle: true,
     loader: { '.tsx': 'tsx' },
     plugins: [
-      ESBuildDenoLoader.denoPlugin({
-        // TODO: detect import-map being used in run.sh and use the same one here
-        importMapURL: toFileUrl(resolve('./test-import-map.json')),
-      })
+      ESBuildDenoLoader.denoPlugin(denoPluginSettings()),
     ],
   })
 
