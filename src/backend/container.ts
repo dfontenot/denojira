@@ -183,7 +183,7 @@ export const makeContainer = () => {
   ])
 
   /** NOTE: has side effects of registering SIGTERM and SIGINT */
-  container.bind<AbortController>(DISymbols.AbortController).toDynamicValue((context: interfaces.Context) => {
+  container.bind<AbortController>(DISymbols.AbortControllerId).toDynamicValue((context: interfaces.Context) => {
     if (abortController != null) {
       return abortController
     }
