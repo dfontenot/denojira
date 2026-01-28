@@ -1,35 +1,15 @@
 import { asynciter } from 'asynciter'
-import {
-  Container,
-  type interfaces,
-} from 'inversify'
+import { Container, type interfaces } from 'inversify'
 import { walk } from 'fs'
 import * as Logger from 'logger'
-import {
-  Application,
-  Context,
-  Middleware,
-  Router,
-} from 'oak'
+import { Application, Context, Middleware, Router } from 'oak'
 import * as Postgres from 'postgres'
-import {
-  getDirectoryName,
-  getModuleName,
-} from './meta.ts'
+import { getDirectoryName, getModuleName } from './meta.ts'
 import { makePool } from './db/connection.ts'
 import * as DISymbols from './types.ts'
-import {
-  DbLaneRepository,
-  LaneRepository
-} from './db/repository/LaneRepository.ts'
-import {
-  DbCardRepository,
-  CardRepository
-} from './db/repository/CardRepository.ts'
-import {
-  type DbClient,
-  PoolOrTxClient,
-} from './db/DbClient.ts'
+import { DbLaneRepository, LaneRepository } from './db/repository/LaneRepository.ts'
+import { CardRepository, DbCardRepository } from './db/repository/CardRepository.ts'
+import { type DbClient, PoolOrTxClient } from './db/DbClient.ts'
 import {
   appHandler,
   createNewCardHandler,
@@ -50,6 +30,8 @@ export type OakMiddleware = Middleware<Record<string, any>, Context<Record<strin
 
 const defaultLogLevel = 'DEBUG'
 
+let abortController: AbortController | null = null
+
 const collectLoggerModules = async (): Promise<Record<string, Logger.LoggerConfig>> => {
   const backendDirectoryBasename = getDirectoryName(import.meta.url)
 
@@ -65,7 +47,10 @@ const collectLoggerModules = async (): Promise<Record<string, Logger.LoggerConfi
   ]
 
   return await asynciter(walk(backendDirectoryBasename, { includeDirs: false, exts: ['ts'], skip: ignore }))
-    .reduce({}, (acc, entry) => ({...acc, [getModuleName(entry.path)]: { level: defaultLogLevel, handlers: ['console',], }}))
+    .reduce(
+      {},
+      (acc, entry) => ({ ...acc, [getModuleName(entry.path)]: { level: defaultLogLevel, handlers: ['console'] } }),
+    )
 }
 
 export const makeContainer = () => {
@@ -78,58 +63,82 @@ export const makeContainer = () => {
     loggers: {
       default: {
         level: defaultLogLevel,
-        handlers: ['console',],
+        handlers: ['console'],
       },
       server: { // the logger for anything in server.tsx
         level: defaultLogLevel,
-        handlers: ['console',],
+        handlers: ['console'],
       },
-      ...(await collectLoggerModules())
+      ...(await collectLoggerModules()),
     },
   }))
 
-  container.bind<Postgres.Pool>(DISymbols.DbConnectionPoolId).toDynamicValue((_context: interfaces.Context) => makePool()).inSingletonScope()
+  container.bind<Postgres.Pool>(DISymbols.DbConnectionPoolId).toDynamicValue((_context: interfaces.Context) =>
+    makePool()
+  ).inSingletonScope()
 
   container.bind<DbClient>(DISymbols.DbClientId).to(PoolOrTxClient)
 
   container.bind<interfaces.Factory<DbClient>>(DISymbols.DbClientFromTxFactoryId)
-    .toFactory<DbClient, [Postgres.Transaction]>((_context: interfaces.Context) =>
-      (tx: Postgres.Transaction) => new PoolOrTxClient(tx))
+    .toFactory<DbClient, [Postgres.Transaction]>((_context: interfaces.Context) => (tx: Postgres.Transaction) =>
+      new PoolOrTxClient(tx)
+    )
 
   container.bind<LaneRepository>(DISymbols.LaneRepositoryId).to(DbLaneRepository)
 
   container.bind<interfaces.Factory<LaneRepository>>(DISymbols.LaneRepositoryFactoryId)
-    .toFactory<LaneRepository, [Postgres.Transaction]>((context: interfaces.Context) =>
-      (tx: Postgres.Transaction) => new DbLaneRepository(context.container.get<(tx: Postgres.Transaction) => DbClient>(DISymbols.DbClientFromTxFactoryId)(tx)))
+    .toFactory<LaneRepository, [Postgres.Transaction]>((context: interfaces.Context) => (tx: Postgres.Transaction) =>
+      new DbLaneRepository(
+        context.container.get<(tx: Postgres.Transaction) => DbClient>(DISymbols.DbClientFromTxFactoryId)(tx),
+      )
+    )
 
   container.bind<CardRepository>(DISymbols.CardRepositoryId).to(DbCardRepository)
 
-  container.bind<OakHandler>(DISymbols.GetCardsHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Context) => getCardsHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
+  container.bind<OakHandler>(DISymbols.GetCardsHandlerId).toDynamicValue(
+    (context: interfaces.Context) => (ctx: Context) =>
+      getCardsHandler(context.container.get(DISymbols.CardRepositoryId), ctx),
+  )
 
-  container.bind<OakHandler>(DISymbols.CreateNewCardHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Context) => createNewCardHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
+  container.bind<OakHandler>(DISymbols.CreateNewCardHandlerId).toDynamicValue(
+    (context: interfaces.Context) => (ctx: Context) =>
+      createNewCardHandler(context.container.get(DISymbols.CardRepositoryId), ctx),
+  )
 
-  container.bind<OakHandler>(DISymbols.MoveCardHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Context) => moveCardHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
+  container.bind<OakHandler>(DISymbols.MoveCardHandlerId).toDynamicValue(
+    (context: interfaces.Context) => (ctx: Context) =>
+      moveCardHandler(context.container.get(DISymbols.CardRepositoryId), ctx),
+  )
 
-  container.bind<OakHandler>(DISymbols.DeleteCardHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Context) => deleteCardHandler(context.container.get(DISymbols.CardRepositoryId), ctx))
+  container.bind<OakHandler>(DISymbols.DeleteCardHandlerId).toDynamicValue(
+    (context: interfaces.Context) => (ctx: Context) =>
+      deleteCardHandler(context.container.get(DISymbols.CardRepositoryId), ctx),
+  )
 
-  container.bind<OakHandler>(DISymbols.GetLanesHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Context) => getLanesHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+  container.bind<OakHandler>(DISymbols.GetLanesHandlerId).toDynamicValue(
+    (context: interfaces.Context) => (ctx: Context) =>
+      getLanesHandler(context.container.get(DISymbols.LaneRepositoryId), ctx),
+  )
 
-  container.bind<OakHandler>(DISymbols.CreateLaneHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Context) => createNewLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+  container.bind<OakHandler>(DISymbols.CreateLaneHandlerId).toDynamicValue(
+    (context: interfaces.Context) => (ctx: Context) =>
+      createNewLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx),
+  )
 
-  container.bind<OakHandler>(DISymbols.DisableLaneHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Context) => disableLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+  container.bind<OakHandler>(DISymbols.DisableLaneHandlerId).toDynamicValue(
+    (context: interfaces.Context) => (ctx: Context) =>
+      disableLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx),
+  )
 
-  container.bind<OakHandler>(DISymbols.EnableLaneHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Context) => enableLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+  container.bind<OakHandler>(DISymbols.EnableLaneHandlerId).toDynamicValue(
+    (context: interfaces.Context) => (ctx: Context) =>
+      enableLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx),
+  )
 
-  container.bind<OakHandler>(DISymbols.DeleteLaneHandlerId).toDynamicValue((context: interfaces.Context) =>
-    (ctx: Context) => deleteLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx))
+  container.bind<OakHandler>(DISymbols.DeleteLaneHandlerId).toDynamicValue(
+    (context: interfaces.Context) => (ctx: Context) =>
+      deleteLaneHandler(context.container.get(DISymbols.LaneRepositoryId), ctx),
+  )
 
   container.bind<OakHandler>(DISymbols.CSSHandlerId).toFunction(cssHandler)
 
@@ -173,6 +182,27 @@ export const makeContainer = () => {
     },
   ])
 
+  /** NOTE: has side effects of registering SIGTERM and SIGINT */
+  container.bind<AbortController>(DISymbols.AbortController).toDynamicValue((context: interfaces.Context) => {
+    if (abortController != null) {
+      return abortController
+    }
+
+    abortController = new AbortController()
+
+    Deno.addSignalListener('SIGTERM', () => {
+      console.log('Aborting for SIGTERM')
+      controller.abort()
+    })
+
+    Deno.addSignalListener('SIGINT', () => {
+      console.log('Aborting for SIGINT')
+      controller.abort()
+    })
+
+    return abortController
+  })
+
   container.bind<Application>(DISymbols.ApplicationId).toDynamicValue((context: interfaces.Context) => {
     const app = new Application()
 
@@ -182,7 +212,7 @@ export const makeContainer = () => {
     middleware.forEach((middleware) => app.use(middleware)) // TODO: use apply()
 
     app.addEventListener('listen', () => {
-      console.log('Listening on http://localhost:8000');
+      console.log('Listening on http://localhost:8000')
     })
 
     app.use(router.routes())
