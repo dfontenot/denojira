@@ -17,6 +17,7 @@ services:
     ports:
       - "8000:8000"
     environment:
+      DB_HOST: db
       DB_PASSWORD: password
     # NOTE: hot-reload not implemented
     volumes:
@@ -26,8 +27,11 @@ services:
       - db
     build:
       context: .
-    command: -c '/app/bin/migrate.ts'
+    # NOTE: will drop the tables for a fresh setup
+    # with up to date schema, will revisit
+    command: -c 'bin/migrate.ts'
     environment:
+      DB_HOST: db
       DB_PASSWORD: password
     volumes:
       - ./:/app
