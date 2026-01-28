@@ -2,12 +2,8 @@ import Dex from 'dex'
 
 const dex = Dex({ client: 'postgres' })
 
-// NOTE: this won't work if the table exists because it needs a CASCADE in the drop table
-// TODO: do a hack around this for now
-// see: https://github.com/knex/knex/issues/974
-
 // deno-lint-ignore-file no-explicit-any
-export const lanesCreateTableQuery = dex.schema.dropTableIfExists('lanes').createTable('lanes', (table) => {
+export const lanesCreateTableQuery = dex.schema.createTable('lanes', (table) => {
   table.increments('id').primary()
   table.string('name', 256)
   table.integer('precedence').unique()
@@ -16,7 +12,7 @@ export const lanesCreateTableQuery = dex.schema.dropTableIfExists('lanes').creat
 })
 
 // deno-lint-ignore-file no-explicit-any
-export const cardsCreateTableQuery = dex.schema.dropTableIfExists('cards').createTable('cards', (table) => {
+export const cardsCreateTableQuery = dex.schema.createTable('cards', (table) => {
   table.increments('id').primary()
   table.string('title', 256)
   table.text('description')
@@ -25,3 +21,16 @@ export const cardsCreateTableQuery = dex.schema.dropTableIfExists('cards').creat
   table.timestamps(true, true, false)
 })
 
+// need to reorder what dex gives as the output
+export const allQueryStrings = [lanesCreateTableQuery, cardsCreateTableQuery].flatMap((query) =>
+  query.toString().split(';')
+).map((queryStr) => queryStr.trim()).sort((lhs, rhs) => {
+  const lhsIsAlter = lhs.toLowerCase().startsWith('alter')
+  const rhsIsAlter = rhs.toLowerCase().startsWith('alter')
+
+  if (lhsIsAlter == rhsIsAlter) {
+    return lhs.localeCompare(rhs)
+  }
+
+  return lhsIsAlter ? 1 : -1
+}).join('; ')

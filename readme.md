@@ -17,7 +17,19 @@ Uses
 
 ## Run it
 
-`docker compose up --build` or without Docker `./run.sh` then navigate to https://localhost:8000
+### With Docker
+
+`docker compose --profile migrate up --build`
+
+For subsequent runs, omit the `--profile migrate` to not re-run the migration job. The migration job is currently destructive and will delete the entire dockerized database.
+
+### On host
+
+1. Setup the DB manually via init.sql
+1. `deno install --allow-net --allow-read --allow-write -n esbuild https://deno.land/x/esbuild@v0.15.16/mod.js`
+1. Run `./run.sh`
+
+Navigate to http://localhost:8000
 
 ## Development
 
@@ -26,8 +38,6 @@ Uses
 At the moment, the server is set up around supporting a dev setup where most assets are generated when requested. Future work will be to have the web server host a pre-built JS bundle and prebuilt CSS.
 
 ### Setup
-
-1. `deno install --allow-net --allow-read --allow-write -n esbuild https://deno.land/x/esbuild@v0.15.16/mod.js`
 
 ## Ops
 
