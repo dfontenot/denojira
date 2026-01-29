@@ -1,0 +1,3 @@
+/* esm.sh - @react-dnd/shallowequal@4.0.2 */
+function o(t,e,n,u){let l=n?n.call(u,t,e):void 0;if(l!==void 0)return!!l;if(t===e)return!0;if(typeof t!="object"||!t||typeof e!="object"||!e)return!1;let s=Object.keys(t),a=Object.keys(e);if(s.length!==a.length)return!1;let y=Object.prototype.hasOwnProperty.bind(e);for(let f=0;f<s.length;f++){let r=s[f];if(!y(r))return!1;let i=t[r],c=e[r];if(l=n?n.call(u,i,c,r):void 0,l===!1||l===void 0&&i!==c)return!1}return!0}export{o as shallowEqual};
+//# sourceMappingURL=shallowequal.development.mjs.map

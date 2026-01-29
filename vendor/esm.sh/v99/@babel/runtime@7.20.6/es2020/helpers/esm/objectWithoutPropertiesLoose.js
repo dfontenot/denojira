@@ -1,2 +1,0 @@
-/* esm.sh - esbuild bundle(@babel/runtime@7.20.6/helpers/esm/objectWithoutPropertiesLoose) es2020 production */
-var d=Object.defineProperty;var l=(e,r)=>{for(var t in r)d(e,t,{get:r[t],enumerable:!0})};var f={};l(f,{default:()=>i});function i(e,r){if(e==null)return{};var t={},u=Object.keys(e),o,n;for(n=0;n<u.length;n++)o=u[n],!(r.indexOf(o)>=0)&&(t[o]=e[o]);return t}var{default:a,..._}=f,c=a!==void 0?a:_;export{c as default};

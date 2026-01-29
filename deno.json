@@ -13,5 +13,5 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "importMap": "./vendor/import_map.json"
+  "importMap": "./vendor/backend/import_map.json"
 }

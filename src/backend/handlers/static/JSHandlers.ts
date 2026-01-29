@@ -5,7 +5,14 @@ import { resolve, toFileUrl } from 'path'
 
 const denoPluginSettings = () => {
   return {
-    importMapURL: toFileUrl(resolve(Deno.mainModule == 'test' ? './test-import-map.json' : './vendor/import_map.json')),
+    importMapURL: toFileUrl(
+      resolve(
+        (Deno.mainModule == 'test' && Deno.env.get('PRODUCTION') === undefined)
+          // frontend import map is compiled with ?dev on esm.sh
+          ? './vendor/frontend/import_map.json'
+          : './vendor/backend/import_map.json',
+      ),
+    ),
   }
 }
 

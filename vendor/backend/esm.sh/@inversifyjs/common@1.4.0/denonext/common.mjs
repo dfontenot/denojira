@@ -1,0 +1,3 @@
+/* esm.sh - @inversifyjs/common@1.4.0 */
+function n(t){switch(typeof t){case"string":case"symbol":return t.toString();case"function":return t.name;default:throw new Error(`Unexpected ${typeof t} service id type`)}}var r=Symbol.for("@inversifyjs/common/islazyServiceIdentifier"),i=class{[r];#t;constructor(e){this.#t=e,this[r]=!0}static is(e){return typeof e=="object"&&e!==null&&e[r]===!0}unwrap(){return this.#t()}};export{i as LazyServiceIdentifier,n as stringifyServiceIdentifier};
+//# sourceMappingURL=common.mjs.map
