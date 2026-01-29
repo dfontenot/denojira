@@ -7,10 +7,7 @@ const denoPluginSettings = () => {
   return {
     importMapURL: toFileUrl(
       resolve(
-        (Deno.mainModule == 'test' && Deno.env.get('PRODUCTION') === undefined)
-          // frontend import map is compiled with ?dev on esm.sh
-          ? './vendor/frontend/import_map.json'
-          : './vendor/backend/import_map.json',
+        Deno.mainModule == 'test' ? './vendor/test/import_map.json' : './vendor/frontend/import_map.json',
       ),
     ),
   }
