@@ -1,6 +1,6 @@
 # denojira
 
-A Jira clone. This project is an experiment to see what is involved with porting a legacy framework-less React application to the Deno runtime instead of Node.JS.
+A Jira clone. This project is an experiment to see what is involved with porting a legacy framework-less React application to the Deno runtime instead of Node.JS. The tl;dr from this experiment is that it's probably better to keep an already built SSR React application running on Node.JS, and use a Deno-native JSX framework like [Fresh](https://fresh.deno.dev/) for new application development.
 
 ![a screenshot demo of the website](./demo.png "website demo with a few cards")
 
