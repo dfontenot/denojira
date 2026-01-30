@@ -9,6 +9,7 @@ services:
       POSTGRES_DB: denojira
     volumes:
       - "pgdata:/var/lib/postgresql/data"
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
   server:
     depends_on:
       - db
@@ -37,7 +38,6 @@ services:
       - migrate
     volumes:
       - ./:/app
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 volumes:
   pgdata:
     driver: local
