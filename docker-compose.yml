@@ -20,7 +20,6 @@ services:
     environment:
       DB_HOST: kanban_user
       DB_PASSWORD: kanbanisfun
-      DB_PASSWORD: password
     # NOTE: hot-reload not implemented
     volumes:
       - ./:/app
