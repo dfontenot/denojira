@@ -18,7 +18,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DB_HOST: db
+      DB_HOST: kanban_user
+      DB_PASSWORD: kanbanisfun
       DB_PASSWORD: password
     # NOTE: hot-reload not implemented
     volumes:
@@ -33,7 +34,8 @@ services:
     command: -c 'bin/migrate.ts'
     environment:
       DB_HOST: db
-      DB_PASSWORD: password
+      DB_USER: kanban_user
+      DB_PASSWORD: kanbanisfun
     profiles:
       - migrate
     volumes:

@@ -4,3 +4,5 @@
 -- see: https://github.com/knex/knex/issues/974
 DROP DATABASE IF EXISTS denojira;
 CREATE DATABASE denojira;
+CREATE USER kanban_user WITH ENCRYPTED PASSWORD 'kanbanisfun';
+GRANT ALL PRIVILEGES ON DATABASE denojira TO kanban_user;
