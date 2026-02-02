@@ -9,7 +9,6 @@ services:
       POSTGRES_DB: denojira
     volumes:
       - "pgdata:/var/lib/postgresql/data"
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
   server:
     depends_on:
       - db
@@ -18,8 +17,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DB_HOST: kanban_user
-      DB_PASSWORD: kanbanisfun
+      DB_HOST: denojira
+      DB_PASSWORD: password
     # NOTE: hot-reload not implemented
     volumes:
       - ./:/app
@@ -33,8 +32,8 @@ services:
     command: -c 'bin/migrate.ts'
     environment:
       DB_HOST: db
-      DB_USER: kanban_user
-      DB_PASSWORD: kanbanisfun
+      DB_USER: denojira
+      DB_PASSWORD: password
     profiles:
       - migrate
     volumes:
